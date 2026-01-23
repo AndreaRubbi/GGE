@@ -3,7 +3,7 @@
 [![PyPI version](https://badge.fury.io/py/geneval.svg)](https://badge.fury.io/py/geneval)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Tests](https://github.com/YOUR_USERNAME/geneval/actions/workflows/tests.yml/badge.svg)](https://github.com/YOUR_USERNAME/geneval/actions)
+[![Tests](https://github.com/AndreaRubbi/GenGeneEval/actions/workflows/tests.yml/badge.svg)](https://github.com/AndreaRubbi/GenGeneEval/actions)
 
 **Comprehensive evaluation of generated gene expression data against real datasets.**
 

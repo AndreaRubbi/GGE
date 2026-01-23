@@ -5,8 +5,8 @@ description = "Comprehensive evaluation of generated gene expression data. Compu
 authors = ["GenEval Team <geneval@example.com>"]
 license = "MIT"
 readme = "README.md"
-homepage = "https://github.com/geneval/geneval"
-repository = "https://github.com/geneval/geneval"
+homepage = "https://github.com/AndreaRubbi/GenGeneEval"
+repository = "https://github.com/AndreaRubbi/GenGeneEval"
 keywords = ["gene expression", "evaluation", "metrics", "single-cell", "generative models", "benchmarking"]
 classifiers = [
     "Development Status :: 4 - Beta",
