@@ -1,6 +1,6 @@
 # GenEval: Gene Expression Evaluation Framework
 
-[![PyPI version](https://badge.fury.io/py/geneval.svg)](https://badge.fury.io/py/geneval)
+[![PyPI version](https://badge.fury.io/py/gengeneeval.svg)](https://badge.fury.io/py/gengeneeval)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Tests](https://github.com/AndreaRubbi/GenGeneEval/actions/workflows/tests.yml/badge.svg)](https://github.com/AndreaRubbi/GenGeneEval/actions)

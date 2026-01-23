@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "geneval"
+name = "gengeneeval"
 version = "0.1.0"
 description = "Comprehensive evaluation of generated gene expression data. Computes metrics between real and generated datasets with support for condition matching, train/test splits, and publication-quality visualizations."
 authors = ["GenEval Team <geneval@example.com>"]
