@@ -7,6 +7,24 @@ from scipy.stats import pearsonr, spearmanr
 import torch
 from . import metric_MMD
 
+
+def scanpy_preprocessing(adata: ad.AnnData) -> ad.AnnData:
+    """Apply standard scanpy preprocessing."""
+    adata = adata.copy()
+    sc.pp.normalize_total(adata, target_sum=1e4)
+    sc.pp.log1p(adata)
+    return adata
+
+
+def scanpy_pca(adata: ad.AnnData, n_comps: int = 50) -> ad.AnnData:
+    """Compute PCA on AnnData object."""
+    adata = adata.copy()
+    if adata.n_vars > 2000:
+        sc.pp.highly_variable_genes(adata, n_top_genes=2000, flavor='seurat_v3', subset=True)
+    sc.tl.pca(adata, n_comps=min(n_comps, adata.n_vars - 1, adata.n_obs - 1))
+    return adata
+
+
 class Metric():
     def __init__(self, name: str, fn):
         self.name = name

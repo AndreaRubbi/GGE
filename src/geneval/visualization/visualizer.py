@@ -10,11 +10,15 @@ Provides publication-quality plots for evaluation results:
 """
 from __future__ import annotations
 
-from typing import Dict, List, Optional, Tuple, Union, Any
+from typing import Dict, List, Optional, Tuple, Union, Any, TYPE_CHECKING
 from pathlib import Path
 import numpy as np
 import pandas as pd
 import warnings
+
+if TYPE_CHECKING:
+    from geneval.results import EvaluationResult
+    from geneval.data.loader import GeneExpressionDataLoader
 
 try:
     import matplotlib.pyplot as plt
