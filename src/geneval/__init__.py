@@ -25,7 +25,7 @@ CLI Usage:
               --conditions perturbation cell_type --output results/
 """
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 __author__ = "GenEval Team"
 
 # Main evaluation interface
