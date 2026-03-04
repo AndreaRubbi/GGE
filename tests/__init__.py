@@ -1,5 +1,5 @@
 """
-GenEval Test Suite.
+GGE Test Suite.
 
 Provides comprehensive tests for the gene expression evaluation framework
 along with mock data generators for testing.
@@ -11,7 +11,7 @@ Mock Data Generators
 
 Usage
 -----
->>> from geneval.tests.fixtures import MockDataGenerator
+>>> from gge.tests.fixtures import MockDataGenerator
 >>> generator = MockDataGenerator(n_samples=100, n_genes=50)
 >>> real, generated = generator.generate_paired_data(noise_level=0.3)
 """

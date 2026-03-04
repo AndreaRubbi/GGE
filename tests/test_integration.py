@@ -1,5 +1,5 @@
 """
-Integration tests for the complete GenEval pipeline.
+Integration tests for the complete GGE pipeline.
 
 These tests verify end-to-end functionality from data loading
 through evaluation to visualization.
@@ -18,8 +18,8 @@ class TestEndToEndPipeline:
     @requires_anndata
     def test_basic_evaluation_pipeline(self, sample_anndata, temp_dir):
         """Test basic evaluation from AnnData to results."""
-        from geneval import evaluate
-        from geneval.metrics import PearsonCorrelation, Wasserstein1Distance
+        from gge import evaluate
+        from gge.metrics import PearsonCorrelation, Wasserstein1Distance
         
         real, generated = sample_anndata
         
@@ -51,8 +51,8 @@ class TestEndToEndPipeline:
     @requires_anndata
     def test_evaluation_with_splits(self, mock_generator, temp_dir):
         """Test evaluation with train/test split."""
-        from geneval import evaluate
-        from geneval.metrics import PearsonCorrelation
+        from gge import evaluate
+        from gge.metrics import PearsonCorrelation
         
         # Generate data (split is included by default)
         real, generated = mock_generator.generate_paired_data(
@@ -82,8 +82,8 @@ class TestEndToEndPipeline:
     @requires_anndata
     def test_evaluation_with_multiple_conditions(self, mock_generator, temp_dir):
         """Test evaluation with multiple condition columns."""
-        from geneval import evaluate
-        from geneval.metrics import SpearmanCorrelation
+        from gge import evaluate
+        from gge.metrics import SpearmanCorrelation
         
         real, generated = mock_generator.generate_paired_data(noise_level=0.3)
         
@@ -108,8 +108,8 @@ class TestEndToEndPipeline:
     @requires_anndata
     def test_results_serialization(self, sample_anndata, temp_dir):
         """Test saving and loading results."""
-        from geneval import evaluate
-        from geneval.metrics import PearsonCorrelation
+        from gge import evaluate
+        from gge.metrics import PearsonCorrelation
         import json
         
         real, generated = sample_anndata
@@ -156,9 +156,9 @@ class TestVisualizationIntegration:
     @requires_anndata
     def test_basic_visualization(self, sample_anndata, temp_dir):
         """Test generating basic visualizations."""
-        from geneval import evaluate
-        from geneval.visualization import EvaluationVisualizer
-        from geneval.metrics import PearsonCorrelation, Wasserstein1Distance
+        from gge import evaluate
+        from gge.visualization import EvaluationVisualizer
+        from gge.metrics import PearsonCorrelation, Wasserstein1Distance
         
         real, generated = sample_anndata
         
@@ -195,9 +195,9 @@ class TestVisualizationIntegration:
     @requires_anndata
     def test_radar_plot(self, sample_anndata, temp_dir):
         """Test radar plot generation."""
-        from geneval import evaluate
-        from geneval.visualization import EvaluationVisualizer
-        from geneval.metrics import (
+        from gge import evaluate
+        from gge.visualization import EvaluationVisualizer
+        from gge.metrics import (
             PearsonCorrelation, 
             SpearmanCorrelation, 
             Wasserstein1Distance
@@ -233,9 +233,9 @@ class TestVisualizationIntegration:
     @requires_anndata
     def test_generate_all_plots(self, sample_anndata, temp_dir):
         """Test generating all plots at once."""
-        from geneval import evaluate
-        from geneval.visualization import EvaluationVisualizer
-        from geneval.metrics import PearsonCorrelation
+        from gge import evaluate
+        from gge.visualization import EvaluationVisualizer
+        from gge.metrics import PearsonCorrelation
         
         real, generated = sample_anndata
         
@@ -294,7 +294,7 @@ class TestDataLoaderIntegration:
         generated.write(gen_path)
         
         # Load and align
-        from geneval.data.loader import GeneExpressionDataLoader
+        from gge.data.loader import GeneExpressionDataLoader
         
         loader = GeneExpressionDataLoader(
             real_path=real_path,
@@ -311,7 +311,7 @@ class TestDataLoaderIntegration:
     @requires_anndata
     def test_condition_iteration(self, sample_anndata, temp_dir):
         """Test iterating over conditions."""
-        from geneval.data.loader import GeneExpressionDataLoader
+        from gge.data.loader import GeneExpressionDataLoader
         
         real, generated = sample_anndata
         
@@ -345,7 +345,7 @@ class TestMetricConsistency:
     
     def test_metric_determinism(self, sample_arrays, gene_names):
         """Test that metrics give consistent results."""
-        from geneval.metrics import PearsonCorrelation, Wasserstein1Distance
+        from gge.metrics import PearsonCorrelation, Wasserstein1Distance
         
         real, generated = sample_arrays
         
@@ -376,7 +376,7 @@ class TestMetricConsistency:
     
     def test_identical_data_gives_perfect_score(self, identical_arrays, gene_names):
         """Test that identical data gives perfect scores."""
-        from geneval.metrics import PearsonCorrelation, Wasserstein1Distance
+        from gge.metrics import PearsonCorrelation, Wasserstein1Distance
         
         real, generated = identical_arrays
         
@@ -394,7 +394,7 @@ class TestMetricConsistency:
     
     def test_metrics_scale_with_noise(self, mock_metric_data, gene_names):
         """Test that metrics degrade with increasing noise."""
-        from geneval.metrics import PearsonCorrelation
+        from gge.metrics import PearsonCorrelation
         
         pearson = PearsonCorrelation()
         
@@ -416,7 +416,7 @@ class TestEdgeCases:
     
     def test_single_sample(self, gene_names):
         """Test metrics with single sample."""
-        from geneval.metrics import Wasserstein1Distance
+        from gge.metrics import Wasserstein1Distance
         
         np.random.seed(42)
         real = np.random.randn(1, 50)
@@ -430,7 +430,7 @@ class TestEdgeCases:
     
     def test_sparse_data(self, mock_metric_data, gene_names):
         """Test metrics with sparse data."""
-        from geneval.metrics import PearsonCorrelation
+        from gge.metrics import PearsonCorrelation
         
         real, generated = mock_metric_data.sparse_data(100, 50, sparsity=0.8)
         
@@ -443,7 +443,7 @@ class TestEdgeCases:
     
     def test_constant_genes(self):
         """Test handling of constant genes."""
-        from geneval.metrics import PearsonCorrelation
+        from gge.metrics import PearsonCorrelation
         
         real = np.ones((100, 10))
         generated = np.ones((100, 10))
@@ -459,7 +459,7 @@ class TestEdgeCases:
     def test_empty_condition(self, temp_dir):
         """Test handling when a condition has no samples."""
         import anndata as ad
-        from geneval.data.loader import GeneExpressionDataLoader
+        from gge.data.loader import GeneExpressionDataLoader
         
         # Create minimal data with a condition that exists only in real
         np.random.seed(42)
@@ -511,8 +511,8 @@ class TestCustomMetrics:
     
     def test_register_custom_metric(self, sample_arrays, gene_names):
         """Test registering and using a custom metric."""
-        from geneval.metrics.base_metric import BaseMetric, MetricResult
-        from geneval.evaluator import MetricRegistry
+        from gge.metrics.base_metric import BaseMetric, MetricResult
+        from gge.evaluator import MetricRegistry
         import numpy as np
         
         class MeanAbsoluteDifference(BaseMetric):

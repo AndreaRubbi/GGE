@@ -1,19 +1,19 @@
 """
-Testing utilities for GenEval.
+Testing utilities for GGE.
 
 This module provides mock data generators and testing helpers
-that users can use to test their own integrations with GenEval.
+that users can use to test their own integrations with GGE.
 
 Examples
 --------
->>> from geneval.testing import MockDataGenerator
+>>> from gge.testing import MockDataGenerator
 >>> 
 >>> # Generate synthetic paired datasets
 >>> generator = MockDataGenerator(n_samples=100, n_genes=50, seed=42)
 >>> real, generated = generator.generate_paired_data(noise_level=0.3)
 >>> 
 >>> # Use with evaluation
->>> from geneval import evaluate
+>>> from gge import evaluate
 >>> results = evaluate(
 ...     real_data=real,
 ...     generated_data=generated,

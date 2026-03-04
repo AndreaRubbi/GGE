@@ -1,5 +1,5 @@
 """
-Configuration settings for GenEval.
+Configuration settings for GGE.
 
 Provides centralized configuration for metrics, paths, and defaults.
 """
@@ -84,7 +84,7 @@ class PlotConfig:
 @dataclass
 class Config:
     """
-    Main configuration class for GenEval.
+    Main configuration class for GGE.
     
     Combines all configuration settings.
     """

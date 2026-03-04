@@ -1,5 +1,5 @@
 """
-Pytest configuration and shared fixtures for GenEval tests.
+Pytest configuration and shared fixtures for GGE tests.
 """
 import pytest
 import sys
@@ -153,7 +153,7 @@ def poor_quality_anndata(mock_generator):
 def create_mock_loader(saved_anndata):
     """Factory fixture to create data loaders."""
     def _create_loader(**kwargs):
-        from geneval.data.loader import GeneExpressionDataLoader
+        from gge.data.loader import GeneExpressionDataLoader
         
         real_path, gen_path = saved_anndata
         
@@ -176,8 +176,8 @@ def create_mock_loader(saved_anndata):
 def create_mock_evaluator(create_mock_loader):
     """Factory fixture to create evaluators."""
     def _create_evaluator(metrics=None, **kwargs):
-        from geneval.evaluator import GeneEvalEvaluator
-        from geneval.metrics import PearsonCorrelation, Wasserstein1Distance
+        from gge.evaluator import GeneEvalEvaluator
+        from gge.metrics import PearsonCorrelation, Wasserstein1Distance
         
         loader = create_mock_loader()
         

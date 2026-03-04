@@ -1,5 +1,5 @@
 """
-Command-line interface for GenEval gene expression evaluation.
+Command-line interface for GGE (Generated Genetic Expression Evaluator).
 
 Provides comprehensive CLI for evaluating generated vs real gene expression data.
 """
@@ -14,9 +14,9 @@ from typing import List, Optional
 def create_parser() -> argparse.ArgumentParser:
     """Create the argument parser."""
     parser = argparse.ArgumentParser(
-        prog="geneval",
+        prog="gge",
         description="""
-GenEval: Comprehensive evaluation of generated gene expression data.
+GGE: Generated Genetic Expression Evaluator - Comprehensive evaluation of generated gene expression data.
 
 Computes metrics between real and generated datasets, matching samples
 by condition columns (e.g., perturbation, cell type). Supports train/test
@@ -219,7 +219,7 @@ def main(args: Optional[List[str]] = None):
     
     if verbose:
         print("=" * 60)
-        print("GenEval: Gene Expression Evaluation")
+        print("GGE: Gene Expression Evaluation")
         print("=" * 60)
         print(f"\nReal data:      {real_path}")
         print(f"Generated data: {gen_path}")

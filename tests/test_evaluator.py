@@ -1,5 +1,5 @@
 """
-Tests for GenEval evaluator and data loader.
+Tests for GGE evaluator and data loader.
 """
 import tempfile
 from pathlib import Path
@@ -13,10 +13,10 @@ try:
 except ImportError:
     HAS_ANNDATA = False
 
-from geneval.evaluator import GeneEvalEvaluator, evaluate
-from geneval.data.loader import GeneExpressionDataLoader, load_data
-from geneval.results import EvaluationResult, SplitResult, ConditionResult
-from geneval.metrics import PearsonCorrelation, Wasserstein1Distance
+from gge.evaluator import GeneEvalEvaluator, evaluate
+from gge.data.loader import GeneExpressionDataLoader, load_data
+from gge.results import EvaluationResult, SplitResult, ConditionResult
+from gge.metrics import PearsonCorrelation, Wasserstein1Distance
 
 
 @pytest.fixture
@@ -307,7 +307,7 @@ class TestDataLoaderError:
     
     def test_missing_file(self, temp_dir):
         """Test error on missing file."""
-        from geneval.data.loader import DataLoaderError
+        from gge.data.loader import DataLoaderError
         
         loader = GeneExpressionDataLoader(
             real_path=temp_dir / "nonexistent.h5ad",
@@ -320,7 +320,7 @@ class TestDataLoaderError:
     
     def test_missing_column(self, saved_anndata):
         """Test error on missing condition column."""
-        from geneval.data.loader import DataLoaderError
+        from gge.data.loader import DataLoaderError
         
         real_path, gen_path = saved_anndata
         

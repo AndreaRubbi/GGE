@@ -17,8 +17,8 @@ import pandas as pd
 import warnings
 
 if TYPE_CHECKING:
-    from geneval.results import EvaluationResult
-    from geneval.data.loader import GeneExpressionDataLoader
+    from gge.results import EvaluationResult
+    from gge.data.loader import GeneExpressionDataLoader
 
 try:
     import matplotlib.pyplot as plt

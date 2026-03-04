@@ -1,5 +1,5 @@
 """
-Mock data generators for GenEval testing.
+Mock data generators for GGE testing.
 
 Provides utilities to create synthetic AnnData objects with realistic
 gene expression patterns for testing evaluation pipelines.

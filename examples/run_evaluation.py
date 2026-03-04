@@ -1,22 +1,22 @@
 #!/usr/bin/env python
 """
-Example: Running GenEval evaluation on gene expression data.
+Example: Running GGE evaluation on gene expression data.
 
-This script demonstrates how to use GenEval to evaluate generated
+This script demonstrates how to use GGE to evaluate generated
 gene expression data against real data.
 """
 import argparse
 from pathlib import Path
 import numpy as np
 
-# Import GenEval
-from geneval import (
+# Import GGE
+from gge import (
     evaluate,
     load_data,
     GeneEvalEvaluator,
     EvaluationVisualizer,
 )
-from geneval.metrics import (
+from gge.metrics import (
     PearsonCorrelation,
     SpearmanCorrelation,
     Wasserstein1Distance,
@@ -29,7 +29,7 @@ def run_basic_evaluation(real_path: str, generated_path: str, output_dir: str):
     Run basic evaluation with default settings.
     """
     print("=" * 60)
-    print("GenEval: Basic Evaluation Example")
+    print("GGE: Basic Evaluation Example")
     print("=" * 60)
     
     # Run evaluation with one line
@@ -56,7 +56,7 @@ def run_custom_evaluation(real_path: str, generated_path: str, output_dir: str):
     Run evaluation with custom metrics and settings.
     """
     print("=" * 60)
-    print("GenEval: Custom Evaluation Example")
+    print("GGE: Custom Evaluation Example")
     print("=" * 60)
     
     # Step 1: Load and align data
@@ -122,7 +122,7 @@ def run_visualization_example(results, loader, output_dir: str):
     Demonstrate visualization capabilities.
     """
     print("\n" + "=" * 60)
-    print("GenEval: Visualization Example")
+    print("GGE: Visualization Example")
     print("=" * 60)
     
     # Create visualizer
@@ -213,7 +213,7 @@ def create_synthetic_data():
 
 
 def main():
-    parser = argparse.ArgumentParser(description="GenEval Example")
+    parser = argparse.ArgumentParser(description="GGE Example")
     parser.add_argument("--real", type=str, help="Path to real data (h5ad)")
     parser.add_argument("--generated", type=str, help="Path to generated data (h5ad)")
     parser.add_argument("--output", type=str, default="example_output", help="Output directory")

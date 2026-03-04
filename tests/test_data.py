@@ -148,7 +148,7 @@ class TestDataLoaderBasics:
     @requires_anndata
     def test_load_files(self, saved_anndata):
         """Test loading h5ad files."""
-        from geneval.data.loader import GeneExpressionDataLoader
+        from gge.data.loader import GeneExpressionDataLoader
         
         real_path, gen_path = saved_anndata
         
@@ -167,7 +167,7 @@ class TestDataLoaderBasics:
     @requires_anndata
     def test_align_genes(self, saved_anndata):
         """Test gene alignment."""
-        from geneval.data.loader import GeneExpressionDataLoader
+        from gge.data.loader import GeneExpressionDataLoader
         
         real_path, gen_path = saved_anndata
         
@@ -186,7 +186,7 @@ class TestDataLoaderBasics:
     @requires_anndata
     def test_get_condition_groups(self, saved_anndata):
         """Test getting condition groups."""
-        from geneval.data.loader import GeneExpressionDataLoader
+        from gge.data.loader import GeneExpressionDataLoader
         
         real_path, gen_path = saved_anndata
         
@@ -215,7 +215,7 @@ class TestDataLoaderSplits:
     @requires_anndata
     def test_data_has_splits(self, mock_generator, temp_dir):
         """Test that generated data has split column."""
-        from geneval.data.loader import GeneExpressionDataLoader
+        from gge.data.loader import GeneExpressionDataLoader
         
         # Generate data (split is included by default)
         real, gen = mock_generator.generate_paired_data(
@@ -232,7 +232,7 @@ class TestDataLoaderSplits:
     @requires_anndata  
     def test_filter_by_split_column(self, mock_generator, temp_dir):
         """Test that split column is passed to loader."""
-        from geneval.data.loader import GeneExpressionDataLoader
+        from gge.data.loader import GeneExpressionDataLoader
         
         # Generate data with splits (split is included by default)
         real, gen = mock_generator.generate_paired_data(
@@ -263,7 +263,7 @@ class TestDataValidation:
     
     def test_missing_file(self, temp_dir):
         """Test error on missing file."""
-        from geneval.data.loader import GeneExpressionDataLoader
+        from gge.data.loader import GeneExpressionDataLoader
         
         loader = GeneExpressionDataLoader(
             real_path=temp_dir / "nonexistent.h5ad",
@@ -277,7 +277,7 @@ class TestDataValidation:
     @requires_anndata
     def test_missing_condition_column(self, temp_dir):
         """Test error on missing condition column."""
-        from geneval.data.loader import GeneExpressionDataLoader
+        from gge.data.loader import GeneExpressionDataLoader
         import anndata as ad
         
         # Create data without required column

@@ -1,13 +1,13 @@
 [tool.poetry]
-name = "gengeneeval"
+name = "gge-eval"
 version = "0.1.1"
-description = "Comprehensive evaluation of generated gene expression data. Computes metrics between real and generated datasets with support for condition matching, train/test splits, and publication-quality visualizations."
-authors = ["GenEval Team <geneval@example.com>"]
+description = "Generated Genetic Expression Evaluator (GGE): Comprehensive evaluation of generated gene expression data. Computes metrics between real and generated datasets with support for condition matching, train/test splits, and publication-quality visualizations."
+authors = ["GGE Team <gge@example.com>"]
 license = "MIT"
 readme = "README.md"
-homepage = "https://github.com/AndreaRubbi/GenGeneEval"
-repository = "https://github.com/AndreaRubbi/GenGeneEval"
-keywords = ["gene expression", "evaluation", "metrics", "single-cell", "generative models", "benchmarking"]
+homepage = "https://github.com/AndreaRubbi/gge"
+repository = "https://github.com/AndreaRubbi/gge"
+keywords = ["gene expression", "evaluation", "metrics", "single-cell", "generative models", "benchmarking", "gge"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Science/Research",
@@ -17,7 +17,7 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
 ]
-packages = [{include = "geneval", from = "src"}]
+packages = [{include = "gge", from = "src"}]
 
 [tool.poetry.dependencies]
 python = "^3.8"
@@ -47,7 +47,7 @@ mypy = ">=1.0.0"
 flake8 = ">=6.0.0"
 
 [tool.poetry.scripts]
-geneval = "geneval.cli:run"
+gge = "gge.cli:run"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

@@ -1,13 +1,13 @@
-# GenEval: Gene Expression Evaluation Framework
+# GGE: Generated Genetic Expression Evaluator
 
-[![PyPI version](https://badge.fury.io/py/gengeneeval.svg)](https://badge.fury.io/py/gengeneeval)
+[![PyPI version](https://badge.fury.io/py/gge-eval.svg)](https://badge.fury.io/py/gge-eval)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Tests](https://github.com/AndreaRubbi/GenGeneEval/actions/workflows/test.yml/badge.svg)](https://github.com/AndreaRubbi/GenGeneEval/actions)
+[![Tests](https://github.com/AndreaRubbi/gge/actions/workflows/test.yml/badge.svg)](https://github.com/AndreaRubbi/gge/actions)
 
 **Comprehensive evaluation of generated gene expression data against real datasets.**
 
-GenEval is a modular, object-oriented Python framework for computing metrics between real and generated gene expression datasets stored in AnnData (h5ad) format. It supports condition-based matching, train/test splits, and generates publication-quality visualizations.
+GGE is a modular, object-oriented Python framework for computing metrics between real and generated gene expression datasets stored in AnnData (h5ad) format. It supports condition-based matching, train/test splits, and generates publication-quality visualizations.
 
 ## Features
 
@@ -42,12 +42,17 @@ All metrics are computed **per-gene** (returning a vector) and **aggregated**:
 
 ### Using pip
 ```bash
+pip install gge-eval
+```
+
+### Development installation
+```bash
 pip install -e .
 ```
 
 ### With GPU support (faster distance metrics)
 ```bash
-pip install -e ".[gpu]"
+pip install "gge-eval[gpu]"
 ```
 
 ## Quick Start
@@ -55,7 +60,7 @@ pip install -e ".[gpu]"
 ### Python API
 
 ```python
-from geneval import evaluate
+from gge import evaluate
 
 # Run evaluation
 results = evaluate(
@@ -79,27 +84,27 @@ for condition, cond_result in test_results.conditions.items():
 
 ```bash
 # Basic usage
-geneval --real real.h5ad --generated generated.h5ad \
-        --conditions perturbation cell_type \
-        --output results/
+gge --real real.h5ad --generated generated.h5ad \
+    --conditions perturbation cell_type \
+    --output results/
 
 # With split column
-geneval --real real.h5ad --generated generated.h5ad \
-        --conditions perturbation \
-        --split-column split \
-        --splits test \
-        --output results/
+gge --real real.h5ad --generated generated.h5ad \
+    --conditions perturbation \
+    --split-column split \
+    --splits test \
+    --output results/
 
 # Specify metrics
-geneval --real real.h5ad --generated generated.h5ad \
-        --conditions perturbation \
-        --metrics pearson spearman wasserstein_1 mmd \
-        --output results/
+gge --real real.h5ad --generated generated.h5ad \
+    --conditions perturbation \
+    --metrics pearson spearman wasserstein_1 mmd \
+    --output results/
 ```
 
 ## Expected Data Format
 
-GenEval expects AnnData (h5ad) files with:
+GGE expects AnnData (h5ad) files with:
 
 ### Required
 - `adata.X`: Gene expression matrix (samples × genes)

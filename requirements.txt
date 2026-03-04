@@ -1,4 +1,4 @@
-# GenEval Dependencies
+# GGE (Generated Genetic Expression Evaluator) Dependencies
 # Core dependencies
 anndata>=0.8.0
 scanpy>=1.9.0

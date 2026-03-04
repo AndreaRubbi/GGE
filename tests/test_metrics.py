@@ -1,10 +1,10 @@
 """
-Tests for GenEval metrics module.
+Tests for GGE metrics module.
 """
 import numpy as np
 import pytest
 
-from geneval.metrics import (
+from gge.metrics import (
     PearsonCorrelation,
     SpearmanCorrelation,
     MeanPearsonCorrelation,
@@ -16,7 +16,7 @@ from geneval.metrics import (
     MultivariateWasserstein,
     MultivariateMMD,
 )
-from geneval.metrics.base_metric import MetricResult
+from gge.metrics.base_metric import MetricResult
 
 
 @pytest.fixture

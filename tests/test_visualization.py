@@ -13,8 +13,8 @@ from .conftest import requires_anndata
 @pytest.fixture
 def mock_results():
     """Create mock EvaluationResult for testing visualizations."""
-    from geneval.results import EvaluationResult, SplitResult, ConditionResult
-    from geneval.metrics.base_metric import MetricResult
+    from gge.results import EvaluationResult, SplitResult, ConditionResult
+    from gge.metrics.base_metric import MetricResult
     
     # Create mock metric results
     np.random.seed(42)
@@ -76,7 +76,7 @@ class TestEvaluationVisualizer:
     
     def test_create_visualizer(self, mock_results):
         """Test creating a visualizer."""
-        from geneval.visualization import EvaluationVisualizer
+        from gge.visualization import EvaluationVisualizer
         
         viz = EvaluationVisualizer(mock_results)
         
@@ -85,7 +85,7 @@ class TestEvaluationVisualizer:
     
     def test_boxplot_metrics(self, mock_results):
         """Test boxplot generation."""
-        from geneval.visualization import EvaluationVisualizer
+        from gge.visualization import EvaluationVisualizer
         import matplotlib.pyplot as plt
         
         viz = EvaluationVisualizer(mock_results)
@@ -97,7 +97,7 @@ class TestEvaluationVisualizer:
     
     def test_violin_metrics(self, mock_results):
         """Test violin plot generation."""
-        from geneval.visualization import EvaluationVisualizer
+        from gge.visualization import EvaluationVisualizer
         import matplotlib.pyplot as plt
         
         viz = EvaluationVisualizer(mock_results)
@@ -109,7 +109,7 @@ class TestEvaluationVisualizer:
     
     def test_radar_plot(self, mock_results):
         """Test radar plot generation."""
-        from geneval.visualization import EvaluationVisualizer
+        from gge.visualization import EvaluationVisualizer
         import matplotlib.pyplot as plt
         
         viz = EvaluationVisualizer(mock_results)
@@ -121,7 +121,7 @@ class TestEvaluationVisualizer:
     
     def test_heatmap_per_gene(self, mock_results):
         """Test heatmap generation."""
-        from geneval.visualization import EvaluationVisualizer
+        from gge.visualization import EvaluationVisualizer
         import matplotlib.pyplot as plt
         
         viz = EvaluationVisualizer(mock_results)
@@ -133,7 +133,7 @@ class TestEvaluationVisualizer:
     
     def test_heatmap_metrics_summary(self, mock_results):
         """Test condition comparison plot."""
-        from geneval.visualization import EvaluationVisualizer
+        from gge.visualization import EvaluationVisualizer
         import matplotlib.pyplot as plt
         
         viz = EvaluationVisualizer(mock_results)
@@ -145,7 +145,7 @@ class TestEvaluationVisualizer:
     
     def test_save_figure(self, mock_results, temp_dir):
         """Test saving figure to file."""
-        from geneval.visualization import EvaluationVisualizer
+        from gge.visualization import EvaluationVisualizer
         import matplotlib.pyplot as plt
         
         viz = EvaluationVisualizer(mock_results)
@@ -162,7 +162,7 @@ class TestEvaluationVisualizer:
     
     def test_save_all(self, mock_results, temp_dir):
         """Test generating all plots at once."""
-        from geneval.visualization import EvaluationVisualizer
+        from gge.visualization import EvaluationVisualizer
         
         viz = EvaluationVisualizer(mock_results)
         
@@ -182,7 +182,7 @@ class TestEmbeddingPlots:
     @requires_anndata
     def test_embedding_plot(self, sample_anndata, mock_results, temp_dir):
         """Test embedding plot with real data."""
-        from geneval.visualization import EvaluationVisualizer
+        from gge.visualization import EvaluationVisualizer
         import matplotlib.pyplot as plt
         
         # Create visualizer - embedding_plot uses the data in results
@@ -195,7 +195,7 @@ class TestEmbeddingPlots:
     @requires_anndata
     def test_embedding_plot_pca_vs_umap(self, sample_anndata, mock_results):
         """Test visualizer creation."""
-        from geneval.visualization import EvaluationVisualizer
+        from gge.visualization import EvaluationVisualizer
         
         viz = EvaluationVisualizer(mock_results)
         assert viz is not None
@@ -206,7 +206,7 @@ class TestPlotCustomization:
     
     def test_custom_figsize(self, mock_results):
         """Test custom figure size."""
-        from geneval.visualization import EvaluationVisualizer
+        from gge.visualization import EvaluationVisualizer
         import matplotlib.pyplot as plt
         
         viz = EvaluationVisualizer(mock_results)
@@ -223,7 +223,7 @@ class TestPlotCustomization:
     
     def test_custom_title(self, mock_results):
         """Test custom title."""
-        from geneval.visualization import EvaluationVisualizer
+        from gge.visualization import EvaluationVisualizer
         import matplotlib.pyplot as plt
         
         viz = EvaluationVisualizer(mock_results)
@@ -242,7 +242,7 @@ class TestPlotting:
     
     def test_standalone_boxplot(self, mock_metric_data):
         """Test standalone boxplot function."""
-        from geneval.visualization.plots import create_boxplot
+        from gge.visualization.plots import create_boxplot
         import matplotlib.pyplot as plt
         
         # Create sample data
@@ -259,7 +259,7 @@ class TestPlotting:
     
     def test_standalone_violin(self, mock_metric_data):
         """Test standalone violin plot function."""
-        from geneval.visualization.plots import create_violin_plot
+        from gge.visualization.plots import create_violin_plot
         import matplotlib.pyplot as plt
         
         data = {
@@ -278,7 +278,7 @@ class TestPlotFileFormats:
     
     def test_save_png(self, mock_results, temp_dir):
         """Test saving as PNG."""
-        from geneval.visualization import EvaluationVisualizer
+        from gge.visualization import EvaluationVisualizer
         import matplotlib.pyplot as plt
         
         viz = EvaluationVisualizer(mock_results)
@@ -292,7 +292,7 @@ class TestPlotFileFormats:
     
     def test_save_pdf(self, mock_results, temp_dir):
         """Test saving as PDF."""
-        from geneval.visualization import EvaluationVisualizer
+        from gge.visualization import EvaluationVisualizer
         import matplotlib.pyplot as plt
         
         viz = EvaluationVisualizer(mock_results)
@@ -306,7 +306,7 @@ class TestPlotFileFormats:
     
     def test_save_svg(self, mock_results, temp_dir):
         """Test saving as SVG."""
-        from geneval.visualization import EvaluationVisualizer
+        from gge.visualization import EvaluationVisualizer
         import matplotlib.pyplot as plt
         
         viz = EvaluationVisualizer(mock_results)

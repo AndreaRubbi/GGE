@@ -1,5 +1,7 @@
 """
-GenEval: Comprehensive evaluation of generated gene expression data.
+GGE: Generated Genetic Expression Evaluator
+
+Comprehensive evaluation of generated gene expression data.
 
 A modular, object-oriented framework for computing metrics between real
 and generated gene expression datasets stored in AnnData (h5ad) format.
@@ -11,8 +13,11 @@ Features:
 - Publication-quality visualizations
 - Command-line interface
 
+Installation:
+    pip install gge-eval
+
 Quick Start:
-    >>> from geneval import evaluate
+    >>> from gge import evaluate
     >>> results = evaluate(
     ...     real_path="real.h5ad",
     ...     generated_path="generated.h5ad", 
@@ -21,12 +26,12 @@ Quick Start:
     ... )
 
 CLI Usage:
-    $ geneval --real real.h5ad --generated generated.h5ad \\
-              --conditions perturbation cell_type --output results/
+    $ gge --real real.h5ad --generated generated.h5ad \\
+          --conditions perturbation cell_type --output results/
 """
 
 __version__ = "0.1.1"
-__author__ = "GenEval Team"
+__author__ = "GGE Team"
 
 # Main evaluation interface
 from .evaluator import (

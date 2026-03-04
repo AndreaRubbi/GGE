@@ -1,10 +1,10 @@
-# Gene Expression Evaluation System
+# GGE: Generated Genetic Expression Evaluator
 
-Welcome to the Gene Expression Evaluation System! This project provides a comprehensive framework for evaluating gene expression data through various metrics and methodologies. 
+Welcome to the Generated Genetic Expression Evaluator (GGE)! This project provides a comprehensive framework for evaluating gene expression data through various metrics and methodologies. 
 
 ## Overview
 
-The Gene Expression Evaluation System is designed to facilitate the comparison of real and generated gene expression profiles. It includes functionalities for loading datasets, computing metrics, and visualizing results. The system is built with modularity in mind, allowing for easy extension and integration with other projects.
+GGE is designed to facilitate the comparison of real and generated gene expression profiles. It includes functionalities for loading datasets, computing metrics, and visualizing results. The system is built with modularity in mind, allowing for easy extension and integration with other projects.
 
 ## Features
 
@@ -15,10 +15,16 @@ The Gene Expression Evaluation System is designed to facilitate the comparison o
 
 ## Installation
 
-To install the required dependencies, run:
+To install GGE from PyPI:
 
 ```
-pip install -r requirements.txt
+pip install gge-eval
+```
+
+Or install from source:
+
+```
+pip install -e .
 ```
 
 ## Usage
@@ -28,13 +34,18 @@ To run an evaluation, you can use the command-line interface or execute the exam
 ### Example
 
 ```python
-from geneval import GeneExpressionEvaluator
+from gge import evaluate
 
 # Initialize the evaluator with your data
-evaluator = GeneExpressionEvaluator(data, generated_output)
+results = evaluate(
+    real_path="real_data.h5ad",
+    generated_path="generated_data.h5ad",
+    condition_columns=["perturbation"],
+    output_dir="output/"
+)
 
-# Run the evaluation
-results = evaluator.evaluate()
+# Access results
+print(results.summary())
 ```
 
 ## Contributing
