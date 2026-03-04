@@ -9,13 +9,31 @@ This guide will get you up and running with GGE in minutes.
 ```python
 from gge import evaluate
 
-# Run evaluation
+# From file paths
 results = evaluate(
-    real_path="real_data.h5ad",
-    generated_path="generated_data.h5ad",
+    real_data="real_data.h5ad",
+    generated_data="generated_data.h5ad",
     condition_columns=["perturbation", "cell_type"],
     split_column="split",  # Optional: for train/test evaluation
     output_dir="evaluation_output/"
+)
+
+# From AnnData objects  
+import scanpy as sc
+real_adata = sc.read_h5ad("real_data.h5ad")
+generated_adata = sc.read_h5ad("generated_data.h5ad")
+
+results = evaluate(
+    real_data=real_adata,
+    generated_data=generated_adata,
+    condition_columns=["perturbation"],
+)
+
+# Mixed (path + AnnData)
+results = evaluate(
+    real_data="real_data.h5ad",
+    generated_data=generated_adata,
+    condition_columns=["perturbation"],
 )
 
 # View summary

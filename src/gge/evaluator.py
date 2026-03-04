@@ -250,8 +250,8 @@ class GeneEvalEvaluator:
 
 
 def evaluate(
-    real_path: Union[str, Path],
-    generated_path: Union[str, Path],
+    real_data: Union[str, Path, "ad.AnnData"],
+    generated_data: Union[str, Path, "ad.AnnData"],
     condition_columns: List[str],
     split_column: Optional[str] = None,
     output_dir: Optional[Union[str, Path]] = None,
@@ -265,10 +265,10 @@ def evaluate(
     
     Parameters
     ----------
-    real_path : str or Path
-        Path to real data h5ad file
-    generated_path : str or Path
-        Path to generated data h5ad file
+    real_data : str, Path, or AnnData
+        Path to real data h5ad file or AnnData object
+    generated_data : str, Path, or AnnData
+        Path to generated data h5ad file or AnnData object
     condition_columns : List[str]
         Columns to match between datasets
     split_column : str, optional
@@ -291,18 +291,32 @@ def evaluate(
         
     Examples
     --------
+    >>> # From paths
     >>> results = evaluate(
     ...     "real.h5ad",
     ...     "generated.h5ad",
     ...     condition_columns=["perturbation", "cell_type"],
-    ...     split_column="split",
     ...     output_dir="evaluation_output/"
+    ... )
+    >>> 
+    >>> # From AnnData objects
+    >>> results = evaluate(
+    ...     real_adata,
+    ...     generated_adata,
+    ...     condition_columns=["perturbation"],
+    ... )
+    >>> 
+    >>> # Mixed (path + AnnData)
+    >>> results = evaluate(
+    ...     "real.h5ad",
+    ...     generated_adata,
+    ...     condition_columns=["perturbation"],
     ... )
     """
     # Load data
     loader = load_data(
-        real_path=real_path,
-        generated_path=generated_path,
+        real_data=real_data,
+        generated_data=generated_data,
         condition_columns=condition_columns,
         split_column=split_column,
         **loader_kwargs

@@ -29,7 +29,7 @@ class GeneExpressionDataLoader:
     Data loader for paired real and generated gene expression datasets.
     
     Handles:
-    - Loading AnnData files (h5ad format)
+    - Loading AnnData files (h5ad format) or accepting AnnData objects directly
     - Validation of required columns
     - Alignment of gene names between datasets
     - Matching samples by condition columns
@@ -37,28 +37,47 @@ class GeneExpressionDataLoader:
     
     Parameters
     ----------
-    real_path : str or Path
-        Path to real data h5ad file
-    generated_path : str or Path
-        Path to generated data h5ad file
+    real_data : str, Path, or AnnData
+        Path to real data h5ad file or AnnData object
+    generated_data : str, Path, or AnnData
+        Path to generated data h5ad file or AnnData object
     condition_columns : List[str]
         Columns to match between datasets (e.g., ['perturbation', 'cell_type'])
     split_column : str, optional
         Column indicating train/test split. If None, all data treated as single split.
     min_samples_per_condition : int
         Minimum samples required per condition to include
+        
+    Examples
+    --------
+    >>> # From paths
+    >>> loader = GeneExpressionDataLoader("real.h5ad", "gen.h5ad", ["perturbation"])
+    >>> 
+    >>> # From AnnData objects
+    >>> loader = GeneExpressionDataLoader(real_adata, gen_adata, ["perturbation"])
+    >>> 
+    >>> # Mixed
+    >>> loader = GeneExpressionDataLoader("real.h5ad", gen_adata, ["perturbation"])
     """
     
     def __init__(
         self,
-        real_path: Union[str, Path],
-        generated_path: Union[str, Path],
+        real_data: Union[str, Path, "ad.AnnData"],
+        generated_data: Union[str, Path, "ad.AnnData"],
         condition_columns: List[str],
         split_column: Optional[str] = None,
         min_samples_per_condition: int = 2,
     ):
-        self.real_path = Path(real_path)
-        self.generated_path = Path(generated_path)
+        # Handle input types
+        self._real_input = real_data
+        self._generated_input = generated_data
+        self._real_is_path = isinstance(real_data, (str, Path))
+        self._generated_is_path = isinstance(generated_data, (str, Path))
+        
+        # Store paths for metadata (use placeholder for AnnData inputs)
+        self.real_path = Path(real_data) if self._real_is_path else Path("<AnnData>")
+        self.generated_path = Path(generated_data) if self._generated_is_path else Path("<AnnData>")
+        
         self.condition_columns = condition_columns
         self.split_column = split_column
         self.min_samples_per_condition = min_samples_per_condition
@@ -84,30 +103,46 @@ class GeneExpressionDataLoader:
     
     def load(self) -> "GeneExpressionDataLoader":
         """
-        Load both datasets from disk.
+        Load both datasets from disk or use provided AnnData objects.
         
         Returns
         -------
         self
             For method chaining
         """
-        # Load real data
-        if not self.real_path.exists():
-            raise DataLoaderError(f"Real data file not found: {self.real_path}")
+        # Load/assign real data
+        if self._real_is_path:
+            real_path = Path(self._real_input)
+            if not real_path.exists():
+                raise DataLoaderError(f"Real data file not found: {real_path}")
+            try:
+                self._real = sc.read_h5ad(real_path)
+            except Exception as e:
+                raise DataLoaderError(f"Failed to load real data: {e}")
+        else:
+            # AnnData object provided directly
+            if not isinstance(self._real_input, ad.AnnData):
+                raise DataLoaderError(
+                    f"real_data must be a path or AnnData object, got {type(self._real_input)}"
+                )
+            self._real = self._real_input.copy()
         
-        try:
-            self._real = sc.read_h5ad(self.real_path)
-        except Exception as e:
-            raise DataLoaderError(f"Failed to load real data: {e}")
-        
-        # Load generated data
-        if not self.generated_path.exists():
-            raise DataLoaderError(f"Generated data file not found: {self.generated_path}")
-        
-        try:
-            self._generated = sc.read_h5ad(self.generated_path)
-        except Exception as e:
-            raise DataLoaderError(f"Failed to load generated data: {e}")
+        # Load/assign generated data
+        if self._generated_is_path:
+            gen_path = Path(self._generated_input)
+            if not gen_path.exists():
+                raise DataLoaderError(f"Generated data file not found: {gen_path}")
+            try:
+                self._generated = sc.read_h5ad(gen_path)
+            except Exception as e:
+                raise DataLoaderError(f"Failed to load generated data: {e}")
+        else:
+            # AnnData object provided directly
+            if not isinstance(self._generated_input, ad.AnnData):
+                raise DataLoaderError(
+                    f"generated_data must be a path or AnnData object, got {type(self._generated_input)}"
+                )
+            self._generated = self._generated_input.copy()
         
         # Validate columns
         self._validate_columns()
@@ -398,8 +433,8 @@ class GeneExpressionDataLoader:
 
 
 def load_data(
-    real_path: Union[str, Path],
-    generated_path: Union[str, Path],
+    real_data: Union[str, Path, "ad.AnnData"],
+    generated_data: Union[str, Path, "ad.AnnData"],
     condition_columns: List[str],
     split_column: Optional[str] = None,
     **kwargs
@@ -409,10 +444,10 @@ def load_data(
     
     Parameters
     ----------
-    real_path : str or Path
-        Path to real data h5ad file
-    generated_path : str or Path
-        Path to generated data h5ad file
+    real_data : str, Path, or AnnData
+        Path to real data h5ad file or AnnData object
+    generated_data : str, Path, or AnnData
+        Path to generated data h5ad file or AnnData object
     condition_columns : List[str]
         Columns to match between datasets
     split_column : str, optional
@@ -424,10 +459,18 @@ def load_data(
     -------
     GeneExpressionDataLoader
         Loaded and aligned data loader
+        
+    Examples
+    --------
+    >>> # From paths
+    >>> loader = load_data("real.h5ad", "gen.h5ad", ["perturbation"])
+    >>> 
+    >>> # From AnnData objects
+    >>> loader = load_data(real_adata, gen_adata, ["perturbation"])
     """
     loader = GeneExpressionDataLoader(
-        real_path=real_path,
-        generated_path=generated_path,
+        real_data=real_data,
+        generated_data=generated_data,
         condition_columns=condition_columns,
         split_column=split_column,
         **kwargs

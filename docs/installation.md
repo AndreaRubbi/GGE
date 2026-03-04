@@ -8,42 +8,11 @@
 
 ## Install from PyPI
 
-The recommended way to install GGE:
-
 ```bash
 pip install gge-eval
 ```
 
-This installs GGE with all core dependencies including `geomloss` for optimal transport metrics.
-
-## GPU Acceleration (Optional)
-
-For faster distance metric computation on GPU, install with pykeops:
-
-```bash
-pip install "gge-eval[gpu]"
-```
-
-!!! note "PyKeOps Requirements"
-    PyKeOps requires a CUDA-capable GPU and appropriate CUDA toolkit installation.
-
-## Install from Source
-
-For development or to get the latest changes:
-
-```bash
-git clone https://github.com/AndreaRubbi/GGE.git
-cd GGE
-pip install -e .
-```
-
-## Full Installation
-
-Install with all optional dependencies (GPU + UMAP):
-
-```bash
-pip install "gge-eval[full]"
-```
+This installs GGE with all dependencies including `geomloss` for optimal transport metrics. GPU acceleration is automatic when available, and falls back to CPU otherwise.
 
 ## Verify Installation
 
