@@ -1,12 +1,13 @@
 [tool.poetry]
 name = "gge-eval"
-version = "0.1.1"
+version = "0.1.2"
 description = "Generated Genetic Expression Evaluator (GGE): Comprehensive evaluation of generated gene expression data. Computes metrics between real and generated datasets with support for condition matching, train/test splits, and publication-quality visualizations."
 authors = ["GGE Team <gge@example.com>"]
 license = "MIT"
 readme = "README.md"
-homepage = "https://github.com/AndreaRubbi/gge"
-repository = "https://github.com/AndreaRubbi/gge"
+homepage = "https://github.com/AndreaRubbi/GGE"
+repository = "https://github.com/AndreaRubbi/GGE"
+documentation = "https://andrearubbi.github.io/GGE/"
 keywords = ["gene expression", "evaluation", "metrics", "single-cell", "generative models", "benchmarking", "gge"]
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -29,13 +30,13 @@ scipy = ">=1.7.0"
 torch = ">=1.9.0"
 matplotlib = ">=3.5.0"
 seaborn = ">=0.11.0"
-geomloss = {version = ">=0.2.1", optional = true}
+geomloss = ">=0.2.1"
 pykeops = {version = ">=1.4.0", optional = true}
 umap-learn = {version = ">=0.5.0", optional = true}
 
 [tool.poetry.extras]
-full = ["geomloss", "pykeops", "umap-learn"]
-gpu = ["geomloss", "pykeops"]
+full = ["pykeops", "umap-learn"]
+gpu = ["pykeops"]
 
 [tool.poetry.group.dev.dependencies]
 pytest = ">=7.0.0"
@@ -45,6 +46,9 @@ black = ">=23.0.0"
 isort = ">=5.0.0"
 mypy = ">=1.0.0"
 flake8 = ">=6.0.0"
+mkdocs = ">=1.5.0"
+mkdocs-material = ">=9.0.0"
+mkdocstrings = {version = ">=0.24.0", extras = ["python"]}
 
 [tool.poetry.scripts]
 gge = "gge.cli:run"

@@ -30,7 +30,7 @@ CLI Usage:
           --conditions perturbation cell_type --output results/
 """
 
-__version__ = "0.1.1"
+__version__ = "0.1.2"
 __author__ = "GGE Team"
 
 # Main evaluation interface

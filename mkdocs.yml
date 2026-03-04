@@ -1,0 +1,68 @@
+site_name: GGE - Generated Genetic Expression Evaluator
+site_url: https://andrearubbi.github.io/GGE/
+site_description: Comprehensive evaluation of generated gene expression data
+site_author: Andrea Rubbi
+
+repo_name: AndreaRubbi/GGE
+repo_url: https://github.com/AndreaRubbi/GGE
+
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - toc.integrate
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+
+nav:
+  - Home: index.md
+  - Installation: installation.md
+  - Quick Start: quickstart.md
+  - User Guide:
+    - Metrics: guide/metrics.md
+    - Visualizations: guide/visualizations.md
+    - CLI Reference: guide/cli.md
+  - API Reference: api.md
+  - Contributing: contributing.md
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: [src]
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - admonition
+  - pymdownx.details
+  - attr_list
+  - md_in_html
+  - tables
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/AndreaRubbi/GGE
+    - icon: fontawesome/brands/python
+      link: https://pypi.org/project/gge-eval/

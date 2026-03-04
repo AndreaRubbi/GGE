@@ -3,7 +3,8 @@
 [![PyPI version](https://badge.fury.io/py/gge-eval.svg)](https://badge.fury.io/py/gge-eval)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Tests](https://github.com/AndreaRubbi/gge/actions/workflows/test.yml/badge.svg)](https://github.com/AndreaRubbi/gge/actions)
+[![Tests](https://github.com/AndreaRubbi/GGE/actions/workflows/test.yml/badge.svg)](https://github.com/AndreaRubbi/GGE/actions)
+[![Documentation](https://img.shields.io/badge/docs-online-blue.svg)](https://andrearubbi.github.io/GGE/)
 
 **Comprehensive evaluation of generated gene expression data against real datasets.**
 
@@ -50,7 +51,8 @@ pip install gge-eval
 pip install -e .
 ```
 
-### With GPU support (faster distance metrics)
+### With GPU acceleration (optional)
+For faster distance metrics on GPU, install with pykeops:
 ```bash
 pip install "gge-eval[gpu]"
 ```
