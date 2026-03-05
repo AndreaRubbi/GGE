@@ -116,10 +116,10 @@ gge --real real.h5ad --generated generated.h5ad \
 
 ### DEG-Space Evaluation
 
-GGE supports evaluating generative models specifically on differentially expressed genes (DEGs), which focuses the evaluation on the genes that matter most for capturing perturbation effects:
+GGE supports evaluating generative models specifically on differentially expressed genes (DEGs), which focuses the evaluation on the genes that matter most for capturing perturbation effects (see Paper Section 4.3):
 
 ```python
-from gge import evaluate_deg_space, identify_degs
+from gge import evaluate_deg_space, identify_degs, compute_perturbation_effects
 import scanpy as sc
 
 real_adata = sc.read_h5ad("real_data.h5ad")
@@ -139,9 +139,17 @@ results, deg_info = evaluate_deg_space(
 
 # View identified DEGs
 print(f"Found {deg_info['is_deg'].sum()} DEGs")
-print(deg_info[deg_info['is_deg']][['gene', 'log2fc', 'pvalue_adj']])
+deg_genes = deg_info[deg_info['is_deg']]['gene'].tolist()
 
-# Or identify DEGs separately
+# Compute perturbation effects (log2 fold changes per condition)
+effects = compute_perturbation_effects(
+    real_adata,
+    condition_column="perturbation",
+    control_value="control",
+)
+print(effects.head())  # DataFrame: genes × conditions with log2FC values
+
+# Or identify DEGs separately for custom workflows
 degs = identify_degs(
     real_adata,
     condition_column="perturbation",
@@ -149,6 +157,74 @@ degs = identify_degs(
     treatment_value="treatment",  # Optional: specific treatment
     method="ttest",  # or "wilcoxon"
 )
+```
+
+### PC-Space Evaluation
+
+For comparing global structure efficiently, GGE provides PC-space (principal component) evaluation (see Paper Section 3.3):
+
+```python
+from gge import evaluate_pc_space, compute_pca, PCSpaceEvaluator
+
+# Quick evaluation in PC space
+results = evaluate_pc_space(
+    real_data=real_adata,
+    generated_data=generated_adata,
+    condition_columns=["perturbation"],
+    n_components=50,              # Number of PCs
+    use_highly_variable=True,     # Filter to HVGs first
+    n_top_genes=2000,             # Number of HVGs
+)
+print(results.summary())
+
+# Or use the evaluator class for more control
+evaluator = PCSpaceEvaluator(n_components=50)
+real_pc, gen_pc = evaluator.transform_to_pc_space(real_adata, generated_adata)
+
+# Access PC coordinates
+real_coords = real_pc.obsm['X_pca']  # shape: (n_samples, n_components)
+gen_coords = gen_pc.obsm['X_pca']
+
+# Compute PCA on a single dataset
+adata_pca = compute_pca(real_adata, n_components=50)
+```
+
+### Combined Evaluation Strategy
+
+For comprehensive evaluation, combine gene-space, DEG-space, and PC-space metrics:
+
+```python
+from gge import evaluate, evaluate_deg_space, evaluate_pc_space
+
+# 1. Full gene-space evaluation
+gene_results = evaluate(
+    real_data=real_adata,
+    generated_data=generated_adata,
+    condition_columns=["perturbation"],
+    metrics=["pearson", "spearman", "r_squared", "wasserstein_1", "mmd"],
+)
+
+# 2. DEG-space evaluation (perturbation-focused)
+deg_results, degs = evaluate_deg_space(
+    real_data=real_adata,
+    generated_data=generated_adata,
+    condition_columns=["perturbation"],
+    deg_condition_column="perturbation",
+    control_value="control",
+    return_degs=True,
+)
+
+# 3. PC-space evaluation (global structure)
+pc_results = evaluate_pc_space(
+    real_data=real_adata,
+    generated_data=generated_adata,
+    condition_columns=["perturbation"],
+    n_components=50,
+)
+
+print("Gene-space:", gene_results.summary())
+print("DEG-space:", deg_results.summary())
+print("PC-space:", pc_results.summary())
 ```
 
 ## Expected Data Format

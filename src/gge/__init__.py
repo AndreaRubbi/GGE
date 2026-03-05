@@ -30,7 +30,7 @@ CLI Usage:
           --conditions perturbation cell_type --output results/
 """
 
-__version__ = "0.1.5"
+__version__ = "0.1.6"
 __author__ = "GGE Team"
 
 # Main evaluation interface
@@ -88,7 +88,18 @@ from .utils.deg import (
     evaluate_deg_space,
     DEGSpaceEvaluator,
     filter_to_degs,
+    get_deg_mask,
     compute_perturbation_effects,
+)
+
+# PC-space utilities
+from .utils.pca import (
+    compute_pca,
+    get_pc_coordinates,
+    project_to_pc_space,
+    PCSpaceEvaluator,
+    evaluate_pc_space,
+    compute_pc_variance_explained,
 )
 
 # Legacy support
@@ -141,7 +152,15 @@ __all__ = [
     "evaluate_deg_space",
     "DEGSpaceEvaluator",
     "filter_to_degs",
+    "get_deg_mask",
     "compute_perturbation_effects",
+    # PC-space utilities
+    "compute_pca",
+    "get_pc_coordinates",
+    "project_to_pc_space",
+    "PCSpaceEvaluator",
+    "evaluate_pc_space",
+    "compute_pc_variance_explained",
     # Testing utilities
     "MockDataGenerator",
     "MockMetricData",
