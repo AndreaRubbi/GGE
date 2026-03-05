@@ -8,7 +8,7 @@
 
 > **Paper**: Accepted at the <a href="https://genai-in-genomics.github.io/index.html">**Gen2 Workshop at ICLR 2026** </a>
 
-![GGE framework](docs/GGE.png)
+![GGE framework](static/GGE.png)
 
 **Comprehensive, standardized evaluation of generated gene expression data.**
 
