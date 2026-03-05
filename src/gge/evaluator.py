@@ -18,6 +18,7 @@ from .metrics.correlation import (
     SpearmanCorrelation,
     MeanPearsonCorrelation,
     MeanSpearmanCorrelation,
+    RSquared,
 )
 from .metrics.distances import (
     Wasserstein1Distance,
@@ -26,6 +27,7 @@ from .metrics.distances import (
     EnergyDistance,
     MultivariateWasserstein,
     MultivariateMMD,
+    MSEDistance,
 )
 from .results import EvaluationResult, SplitResult, ConditionResult
 
@@ -89,7 +91,13 @@ class GeneEvalEvaluator:
         metric_classes = metrics or DEFAULT_METRICS
         
         for m in metric_classes:
-            if isinstance(m, type):
+            if isinstance(m, str):
+                # It's a string name, look up in registry
+                metric_class = MetricRegistry.get(m)
+                if metric_class is None:
+                    raise ValueError(f"Unknown metric: {m}. Available: {MetricRegistry.list_all()}")
+                self.metrics.append(metric_class())
+            elif isinstance(m, type):
                 # It's a class, instantiate it
                 self.metrics.append(m())
             else:
@@ -371,3 +379,5 @@ for metric_class in DEFAULT_METRICS:
 
 MetricRegistry.register(MultivariateWasserstein)
 MetricRegistry.register(MultivariateMMD)
+MetricRegistry.register(RSquared)
+MetricRegistry.register(MSEDistance)

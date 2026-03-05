@@ -305,6 +305,9 @@ class RSquared(CorrelationMetric):
         real: np.ndarray,
         generated: np.ndarray,
         gene_names: Optional[list] = None,
+        aggregate_method: str = "mean",
+        condition: Optional[str] = None,
+        split: Optional[str] = None,
     ):
         """
         Compute overall R² between mean expression profiles.
@@ -446,6 +449,9 @@ class PerturbationEffectCorrelation(CorrelationMetric):
         generated: np.ndarray,
         control_mean: Optional[np.ndarray] = None,
         gene_names: Optional[list] = None,
+        aggregate_method: str = "mean",
+        condition: Optional[str] = None,
+        split: Optional[str] = None,
     ):
         """
         Compute overall perturbation-effect correlation.

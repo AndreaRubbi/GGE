@@ -16,21 +16,17 @@ GGE (Generated Genetic Expression Evaluator) addresses the urgent need for stand
 - **Biologically-motivated evaluation** through DEG-focused analysis with perturbation-effect correlation
 - **Standardized reporting** for reproducible benchmarking
 
-## Key Differentiators
+## Key Features
 
-| Feature | GGE | Others |
-|---------|-----|--------|
-| Explicit space control (raw/pca/deg) | ✓ | — |
-| Perturbation-effect correlation | ✓ | — |
-| Configurable DEG thresholds | ✓ | — |
-| GPU (CUDA) & Apple MPS acceleration | ✓ | Limited |
-| Per-gene & aggregate metrics | ✓ | Varies |
-| Visualization module | ✓ | — |
-| Single Python API call | ✓ | Multi-step |
+- Explicit space control (raw, PCA, DEG)
+- Perturbation-effect correlation (Paper Eq. 1)
+- Configurable DEG thresholds
+- GPU (CUDA) and Apple MPS acceleration
+- Per-gene and aggregate metrics
+- Publication-quality visualizations (static and interactive)
+- Simple Python API and CLI
 
-## Features
-
-### Metrics
+## Metrics
 All metrics are computed **per-gene** (returning a vector) and **aggregated**:
 
 | Metric | Description | Direction |
@@ -45,15 +41,16 @@ All metrics are computed **per-gene** (returning a vector) and **aggregated**:
 | **MMD** | Maximum Mean Discrepancy (RBF kernel) | Lower is better |
 | **Energy Distance** | Statistical potential energy | Lower is better |
 
-### Visualizations
-- **Boxplots & Violin plots**: Metric distributions across conditions
-- **Radar plots**: Multi-metric comparison
-- **Scatter plots**: Real vs generated expression
-- **Embedding plots**: PCA/UMAP of real vs generated data
-- **Heatmaps**: Per-gene metric values
-- **Interactive Plotly plots**: Density overlays, embeddings with metadata coloring
+## Visualizations
 
-### Computation Spaces
+- Boxplots and violin plots for metric distributions
+- Radar plots for multi-metric comparison
+- Scatter plots for real vs generated expression
+- Embedding plots (PCA/UMAP) for real vs generated data
+- Heatmaps for per-gene metric values
+- Interactive Plotly plots with density overlays and metadata coloring
+
+## Computation Spaces
 
 GGE treats computation space as a **first-class parameter** (see Paper Section 3.3):
 
@@ -64,15 +61,6 @@ GGE treats computation space as a **first-class parameter** (see Paper Section 3
 | **DEG Space** | Restricted to differentially expressed genes | Biologically-targeted evaluation |
 
 **Recommendation**: Use multi-space evaluation—PCA-50 for distributional metrics, DEG for biological focus.
-
-### Key Features
-- ✅ **Explicit configuration**: Every choice exposed as a parameter
-- ✅ **Universal space support**: All metrics work in all spaces
-- ✅ **Condition-aware evaluation**: Per condition (cell type × perturbation)
-- ✅ **Perturbation-effect correlation**: Measures direction & magnitude of effects
-- ✅ **Hardware acceleration**: GPU (CUDA) and Apple MPS support
-- ✅ **Lazy data loading**: On-demand loading to avoid memory overhead
-- ✅ **Publication-quality visualizations**: Static and interactive plots
 
 ## Installation
 
@@ -315,9 +303,10 @@ If you use GGE in your research, please cite our paper:
 ```bibtex
 @inproceedings{rubbi2026gge,
   title = {A Standardized Framework for Evaluating Gene Expression Generative Models},
-  author = {Rubbi, Andrea},
+  author = {Rubbi, Andrea and [CO-AUTHORS]},
   booktitle = {Gen2 Workshop at the International Conference on Learning Representations (ICLR)},
   year = {2026},
+  note = {[PROCEEDINGS DETAILS TO BE ADDED]},
   url = {https://github.com/AndreaRubbi/GGE}
 }
 ```

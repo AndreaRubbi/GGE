@@ -63,9 +63,10 @@ If you use GGE in your research, please cite our paper:
 ```bibtex
 @inproceedings{rubbi2026gge,
   title = {A Standardized Framework for Evaluating Gene Expression Generative Models},
-  author = {Rubbi, Andrea},
+  author = {Rubbi, Andrea and [CO-AUTHORS]},
   booktitle = {Gen2 Workshop at the International Conference on Learning Representations (ICLR)},
   year = {2026},
+  note = {[PROCEEDINGS DETAILS TO BE ADDED]},
   url = {https://github.com/AndreaRubbi/GGE}
 }
 ```
