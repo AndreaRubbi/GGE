@@ -30,6 +30,7 @@ All metrics are computed **per-gene** (returning a vector) and **aggregated**:
 - **Scatter plots**: Real vs generated expression
 - **Embedding plots**: PCA/UMAP of real vs generated data
 - **Heatmaps**: Per-gene metric values
+- **Interactive Plotly plots**: Density overlays, embeddings with metadata coloring
 
 ### Key Features
 - ✅ Condition-based matching (perturbation, cell type, etc.)

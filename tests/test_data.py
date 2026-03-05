@@ -153,8 +153,8 @@ class TestDataLoaderBasics:
         real_path, gen_path = saved_anndata
         
         loader = GeneExpressionDataLoader(
-            real_path=real_path,
-            generated_path=gen_path,
+            real_data=real_path,
+            generated_data=gen_path,
             condition_columns=["perturbation"],
         )
         
@@ -172,8 +172,8 @@ class TestDataLoaderBasics:
         real_path, gen_path = saved_anndata
         
         loader = GeneExpressionDataLoader(
-            real_path=real_path,
-            generated_path=gen_path,
+            real_data=real_path,
+            generated_data=gen_path,
             condition_columns=["perturbation"],
         )
         
@@ -191,8 +191,8 @@ class TestDataLoaderBasics:
         real_path, gen_path = saved_anndata
         
         loader = GeneExpressionDataLoader(
-            real_path=real_path,
-            generated_path=gen_path,
+            real_data=real_path,
+            generated_data=gen_path,
             condition_columns=["perturbation"],
         )
         
@@ -245,8 +245,8 @@ class TestDataLoaderSplits:
         gen.write(gen_path)
         
         loader = GeneExpressionDataLoader(
-            real_path=real_path,
-            generated_path=gen_path,
+            real_data=real_path,
+            generated_data=gen_path,
             condition_columns=["perturbation"],
             split_column="split",
         )
@@ -266,8 +266,8 @@ class TestDataValidation:
         from gge.data.loader import GeneExpressionDataLoader
         
         loader = GeneExpressionDataLoader(
-            real_path=temp_dir / "nonexistent.h5ad",
-            generated_path=temp_dir / "also_nonexistent.h5ad",
+            real_data=temp_dir / "nonexistent.h5ad",
+            generated_data=temp_dir / "also_nonexistent.h5ad",
             condition_columns=["perturbation"],
         )
         
@@ -288,14 +288,140 @@ class TestDataValidation:
         gen.write(temp_dir / "gen.h5ad")
         
         loader = GeneExpressionDataLoader(
-            real_path=temp_dir / "real.h5ad",
-            generated_path=temp_dir / "gen.h5ad",
+            real_data=temp_dir / "real.h5ad",
+            generated_data=temp_dir / "gen.h5ad",
             condition_columns=["nonexistent_column"],
         )
         
         # Should raise DataLoaderError during load when validating columns
         with pytest.raises(Exception):  # DataLoaderError
             loader.load()
+
+
+class TestAnnDataObjectLoading:
+    """Test loading AnnData objects directly (not from paths)."""
+    
+    @requires_anndata
+    def test_load_from_anndata_objects(self, mock_generator):
+        """Test loading from AnnData objects directly."""
+        from gge.data.loader import GeneExpressionDataLoader
+        
+        real, gen = mock_generator.generate_paired_data(noise_level=0.3)
+        
+        loader = GeneExpressionDataLoader(
+            real_data=real,
+            generated_data=gen,
+            condition_columns=["perturbation"],
+        )
+        
+        loader.load()
+        loader.align_genes()
+        
+        assert loader.real is not None
+        assert loader.generated is not None
+        assert loader.real.shape[0] == real.shape[0]
+        assert loader.generated.shape[0] == gen.shape[0]
+    
+    @requires_anndata
+    def test_mixed_path_and_object(self, mock_generator, temp_dir):
+        """Test loading with mixed path and AnnData object."""
+        from gge.data.loader import GeneExpressionDataLoader
+        
+        real, gen = mock_generator.generate_paired_data(noise_level=0.3)
+        
+        # Save real to file, keep gen as object
+        real_path = temp_dir / "real.h5ad"
+        real.write(real_path)
+        
+        loader = GeneExpressionDataLoader(
+            real_data=real_path,  # Path
+            generated_data=gen,    # AnnData object
+            condition_columns=["perturbation"],
+        )
+        
+        loader.load()
+        loader.align_genes()
+        
+        assert loader.real is not None
+        assert loader.generated is not None
+    
+    @requires_anndata
+    def test_load_data_function_with_objects(self, mock_generator):
+        """Test load_data convenience function with AnnData objects."""
+        from gge.data.loader import load_data
+        
+        real, gen = mock_generator.generate_paired_data(noise_level=0.3)
+        
+        loader = load_data(
+            real_data=real,
+            generated_data=gen,
+            condition_columns=["perturbation"],
+        )
+        
+        assert loader.real is not None
+        assert loader.generated is not None
+    
+    @requires_anndata
+    def test_evaluate_with_anndata_objects(self, mock_generator, temp_dir):
+        """Test evaluate() function with AnnData objects directly."""
+        from gge.evaluator import evaluate
+        
+        real, gen = mock_generator.generate_paired_data(noise_level=0.3)
+        
+        results = evaluate(
+            real_data=real,
+            generated_data=gen,
+            condition_columns=["perturbation"],
+        )
+        
+        assert results is not None
+        assert len(results.splits) > 0
+    
+    @requires_anndata
+    def test_evaluate_mixed_path_object(self, mock_generator, temp_dir):
+        """Test evaluate() with mixed path and object inputs."""
+        from gge.evaluator import evaluate
+        
+        real, gen = mock_generator.generate_paired_data(noise_level=0.3)
+        
+        # Save real to file
+        real_path = temp_dir / "real.h5ad"
+        real.write(real_path)
+        
+        results = evaluate(
+            real_data=real_path,  # Path
+            generated_data=gen,    # Object
+            condition_columns=["perturbation"],
+        )
+        
+        assert results is not None
+        assert len(results.splits) > 0
+    
+    @requires_anndata
+    def test_anndata_not_modified(self, mock_generator):
+        """Test that original AnnData objects are not modified."""
+        from gge.data.loader import GeneExpressionDataLoader
+        
+        real, gen = mock_generator.generate_paired_data(noise_level=0.3)
+        
+        # Store original shapes
+        original_real_shape = real.shape
+        original_gen_shape = gen.shape
+        original_real_genes = list(real.var_names)
+        
+        loader = GeneExpressionDataLoader(
+            real_data=real,
+            generated_data=gen,
+            condition_columns=["perturbation"],
+        )
+        
+        loader.load()
+        loader.align_genes()
+        
+        # Original objects should not be modified
+        assert real.shape == original_real_shape
+        assert gen.shape == original_gen_shape
+        assert list(real.var_names) == original_real_genes
 
 
 if __name__ == "__main__":

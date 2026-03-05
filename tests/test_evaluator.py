@@ -78,8 +78,8 @@ class TestGeneExpressionDataLoader:
         real_path, gen_path = saved_anndata
         
         loader = GeneExpressionDataLoader(
-            real_path=real_path,
-            generated_path=gen_path,
+            real_data=real_path,
+            generated_data=gen_path,
             condition_columns=["perturbation"],
         )
         loader.load()
@@ -93,8 +93,8 @@ class TestGeneExpressionDataLoader:
         real_path, gen_path = saved_anndata
         
         loader = GeneExpressionDataLoader(
-            real_path=real_path,
-            generated_path=gen_path,
+            real_data=real_path,
+            generated_data=gen_path,
             condition_columns=["perturbation"],
         )
         loader.load()
@@ -238,8 +238,8 @@ class TestEvaluateFunction:
         real_path, gen_path = saved_anndata
         
         results = evaluate(
-            real_path=real_path,
-            generated_path=gen_path,
+            real_data=real_path,
+            generated_data=gen_path,
             condition_columns=["perturbation"],
             output_dir=temp_dir / "results",
             verbose=False,
@@ -310,8 +310,8 @@ class TestDataLoaderError:
         from gge.data.loader import DataLoaderError
         
         loader = GeneExpressionDataLoader(
-            real_path=temp_dir / "nonexistent.h5ad",
-            generated_path=temp_dir / "also_nonexistent.h5ad",
+            real_data=temp_dir / "nonexistent.h5ad",
+            generated_data=temp_dir / "also_nonexistent.h5ad",
             condition_columns=["perturbation"],
         )
         
@@ -325,8 +325,8 @@ class TestDataLoaderError:
         real_path, gen_path = saved_anndata
         
         loader = GeneExpressionDataLoader(
-            real_path=real_path,
-            generated_path=gen_path,
+            real_data=real_path,
+            generated_data=gen_path,
             condition_columns=["nonexistent_column"],
         )
         
@@ -347,8 +347,8 @@ def test_gene_expression_evaluator_legacy(sample_anndata, temp_dir):
     
     # Use new API
     results = evaluate(
-        real_path=real_path,
-        generated_path=gen_path,
+        real_data=real_path,
+        generated_data=gen_path,
         condition_columns=["perturbation"],
         verbose=False,
     )

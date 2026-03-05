@@ -7,6 +7,7 @@ Provides publication-quality plots:
 - Scatter plots for real vs generated expression
 - Embedding plots (PCA, UMAP)
 - Heatmaps for per-gene metrics
+- Interactive Plotly visualizations
 """
 
 from .plots import (
@@ -23,11 +24,26 @@ from .visualizer import (
     visualize,
 )
 
+# Interactive visualizations (optional - requires plotly)
+try:
+    from .interactive import (
+        InteractiveVisualizer,
+        density_overlay,
+        embedding_interactive,
+        PLOTLY_AVAILABLE,
+    )
+except ImportError:
+    PLOTLY_AVAILABLE = False
+    InteractiveVisualizer = None
+    density_overlay = None
+    embedding_interactive = None
+
 __all__ = [
     # Classes
     "EvaluationPlotter",
     "EvaluationVisualizer",
     "PlotStyle",
+    "InteractiveVisualizer",
     # Functions
     "visualize",
     "create_boxplot",
@@ -35,4 +51,8 @@ __all__ = [
     "create_heatmap",
     "create_scatter",
     "create_radar_chart",
+    # Interactive functions
+    "density_overlay",
+    "embedding_interactive",
+    "PLOTLY_AVAILABLE",
 ]
