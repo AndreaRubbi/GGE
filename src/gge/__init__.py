@@ -30,7 +30,7 @@ CLI Usage:
           --conditions perturbation cell_type --output results/
 """
 
-__version__ = "0.1.6"
+__version__ = "0.1.7"
 __author__ = "GGE Team"
 
 # Main evaluation interface
@@ -66,12 +66,15 @@ from .metrics.correlation import (
     MeanPearsonCorrelation,
     MeanSpearmanCorrelation,
     RSquared,
+    PerturbationEffectCorrelation,
+    compute_perturbation_effect_correlation,
 )
 from .metrics.distances import (
     Wasserstein1Distance,
     Wasserstein2Distance,
     MMDDistance,
     EnergyDistance,
+    MSEDistance,
     MultivariateWasserstein,
     MultivariateMMD,
 )
@@ -137,11 +140,14 @@ __all__ = [
     "MeanPearsonCorrelation",
     "MeanSpearmanCorrelation",
     "RSquared",
+    "PerturbationEffectCorrelation",
+    "compute_perturbation_effect_correlation",
     # Distance metrics
     "Wasserstein1Distance",
     "Wasserstein2Distance",
     "MMDDistance",
     "EnergyDistance",
+    "MSEDistance",
     "MultivariateWasserstein",
     "MultivariateMMD",
     # Visualization

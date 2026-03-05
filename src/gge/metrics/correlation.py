@@ -340,3 +340,230 @@ class RSquared(CorrelationMetric):
             aggregate_value=float(overall_r2),
             gene_names=gene_names,
         )
+
+class PerturbationEffectCorrelation(CorrelationMetric):
+    """
+    Perturbation-effect correlation metric.
+    
+    Measures whether models capture the direction and magnitude of perturbation
+    effects, not just absolute expression levels. This is the key biologically-
+    motivated metric from GGE Paper Equation 1.
+    
+    The metric computes:
+        ρ_effect = corr(μ_real - μ_ctrl, μ_gen - μ_ctrl)
+    
+    Where:
+        - μ_real = mean expression of real perturbed cells
+        - μ_gen = mean expression of generated perturbed cells
+        - μ_ctrl = mean expression of control cells
+    
+    This is crucial because computing correlation on raw expression means can
+    be artificially high if control and perturbed conditions have similar
+    expression, regardless of whether the model captures perturbation effects.
+    
+    Parameters
+    ----------
+    method : str
+        Correlation method: 'pearson' or 'spearman'
+    
+    Examples
+    --------
+    >>> metric = PerturbationEffectCorrelation()
+    >>> result = metric.compute(
+    ...     real=perturbed_real,
+    ...     generated=perturbed_generated,
+    ...     control_mean=control_mean  # Mean expression of control cells
+    ... )
+    """
+    
+    def __init__(self, method: str = "pearson"):
+        self.method = method
+        super().__init__(
+            name=f"perturbation_effect_{method}",
+            description=f"{method.capitalize()} correlation on perturbation effects (Paper Eq. 1)"
+        )
+    
+    def compute_per_gene(
+        self,
+        real: np.ndarray,
+        generated: np.ndarray,
+        control_mean: Optional[np.ndarray] = None,
+    ) -> np.ndarray:
+        """
+        Compute perturbation-effect correlation per gene.
+        
+        Parameters
+        ----------
+        real : np.ndarray
+            Real perturbed data, shape (n_samples, n_genes)
+        generated : np.ndarray
+            Generated perturbed data, shape (n_samples, n_genes)
+        control_mean : np.ndarray, optional
+            Mean expression of control cells, shape (n_genes,).
+            If not provided, returns NaN array.
+            
+        Returns
+        -------
+        np.ndarray
+            Per-gene correlation on effects. Shape: (n_genes,)
+        """
+        real = np.atleast_2d(real)
+        generated = np.atleast_2d(generated)
+        n_genes = real.shape[1]
+        
+        if control_mean is None:
+            # Cannot compute without control reference
+            return np.full(n_genes, np.nan)
+        
+        control_mean = np.atleast_1d(control_mean).flatten()
+        if len(control_mean) != n_genes:
+            raise ValueError(
+                f"control_mean has {len(control_mean)} genes but data has {n_genes}"
+            )
+        
+        # Compute mean expression
+        real_mean = real.mean(axis=0)
+        gen_mean = generated.mean(axis=0)
+        
+        # Compute perturbation effects (difference from control)
+        real_effect = real_mean - control_mean
+        gen_effect = gen_mean - control_mean
+        
+        # Per-gene: not really meaningful for single values, but for completeness
+        # We return the signed difference of effects as a proxy
+        effect_diff = np.abs(real_effect - gen_effect)
+        
+        # Normalize to [0, 1] similarity score where 1 is best
+        max_effect = np.maximum(np.abs(real_effect), np.abs(gen_effect))
+        max_effect = np.where(max_effect == 0, 1, max_effect)
+        per_gene_similarity = 1 - (effect_diff / max_effect)
+        
+        return per_gene_similarity
+    
+    def compute(
+        self,
+        real: np.ndarray,
+        generated: np.ndarray,
+        control_mean: Optional[np.ndarray] = None,
+        gene_names: Optional[list] = None,
+    ):
+        """
+        Compute overall perturbation-effect correlation.
+        
+        This is the key metric from GGE Paper Equation 1:
+            ρ_effect = corr(μ_real - μ_ctrl, μ_gen - μ_ctrl)
+        
+        Parameters
+        ----------
+        real : np.ndarray
+            Real perturbed data, shape (n_samples, n_genes)
+        generated : np.ndarray
+            Generated perturbed data, shape (n_samples, n_genes)
+        control_mean : np.ndarray
+            Mean expression of control cells, shape (n_genes,)
+        gene_names : list, optional
+            Gene names for results
+            
+        Returns
+        -------
+        MetricResult
+            Result with aggregate correlation and per-gene values
+        """
+        from .base_metric import MetricResult
+        
+        real = np.atleast_2d(real)
+        generated = np.atleast_2d(generated)
+        n_genes = real.shape[1]
+        
+        if control_mean is None:
+            # Return NaN result if no control provided
+            return MetricResult(
+                name=self.name,
+                per_gene_values=np.full(n_genes, np.nan),
+                aggregate_value=float('nan'),
+                gene_names=gene_names or [f"gene_{i}" for i in range(n_genes)],
+                metadata={"warning": "control_mean not provided"}
+            )
+        
+        control_mean = np.atleast_1d(control_mean).flatten()
+        
+        # Compute mean expression
+        real_mean = real.mean(axis=0)
+        gen_mean = generated.mean(axis=0)
+        
+        # Compute perturbation effects (difference from control)
+        real_effect = real_mean - control_mean
+        gen_effect = gen_mean - control_mean
+        
+        # Compute correlation on effects
+        if self.method == "pearson":
+            if np.std(real_effect) == 0 or np.std(gen_effect) == 0:
+                corr = 0.0
+            else:
+                corr, _ = pearsonr(real_effect, gen_effect)
+        else:  # spearman
+            if np.std(real_effect) == 0 or np.std(gen_effect) == 0:
+                corr = 0.0
+            else:
+                corr, _ = spearmanr(real_effect, gen_effect)
+        
+        per_gene = self.compute_per_gene(real, generated, control_mean)
+        
+        return MetricResult(
+            name=self.name,
+            per_gene_values=per_gene,
+            aggregate_value=float(corr),
+            gene_names=gene_names or [f"gene_{i}" for i in range(n_genes)],
+            metadata={
+                "method": self.method,
+                "n_genes": n_genes,
+            }
+        )
+
+
+def compute_perturbation_effect_correlation(
+    real_perturbed: np.ndarray,
+    generated_perturbed: np.ndarray,
+    control_mean: np.ndarray,
+    method: str = "pearson",
+) -> float:
+    """
+    Convenience function for perturbation-effect correlation.
+    
+    Implements GGE Paper Equation 1:
+        ρ_effect = corr(μ_real - μ_ctrl, μ_gen - μ_ctrl)
+    
+    Parameters
+    ----------
+    real_perturbed : np.ndarray
+        Real perturbed expression, shape (n_samples, n_genes)
+    generated_perturbed : np.ndarray
+        Generated perturbed expression, shape (n_samples, n_genes)
+    control_mean : np.ndarray
+        Mean expression of control cells, shape (n_genes,)
+    method : str
+        'pearson' or 'spearman'
+        
+    Returns
+    -------
+    float
+        Correlation value between -1 and 1
+        
+    Examples
+    --------
+    >>> # Get control mean from real data
+    >>> control_mask = real_adata.obs['condition'] == 'control'
+    >>> control_mean = real_adata[control_mask].X.mean(axis=0)
+    >>> 
+    >>> # Get perturbed data
+    >>> perturbed_real = real_adata[~control_mask].X
+    >>> perturbed_gen = gen_adata[~control_mask].X
+    >>> 
+    >>> # Compute perturbation-effect correlation
+    >>> rho = compute_perturbation_effect_correlation(
+    ...     perturbed_real, perturbed_gen, control_mean
+    ... )
+    """
+    metric = PerturbationEffectCorrelation(method=method)
+    result = metric.compute(real_perturbed, generated_perturbed, control_mean)
+    return result.aggregate_value

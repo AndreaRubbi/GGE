@@ -19,6 +19,8 @@ from .correlation import (
     MeanPearsonCorrelation,
     MeanSpearmanCorrelation,
     RSquared,
+    PerturbationEffectCorrelation,
+    compute_perturbation_effect_correlation,
 )
 from .distances import (
     Wasserstein1Distance,
@@ -27,6 +29,7 @@ from .distances import (
     EnergyDistance,
     MultivariateWasserstein,
     MultivariateMMD,
+    MSEDistance,
 )
 
 # All available metrics
@@ -36,10 +39,12 @@ ALL_METRICS = [
     MeanPearsonCorrelation,
     MeanSpearmanCorrelation,
     RSquared,
+    PerturbationEffectCorrelation,
     Wasserstein1Distance,
     Wasserstein2Distance,
     MMDDistance,
     EnergyDistance,
+    MSEDistance,
     MultivariateWasserstein,
     MultivariateMMD,
 ]
@@ -56,13 +61,17 @@ __all__ = [
     "MeanPearsonCorrelation",
     "MeanSpearmanCorrelation",
     "RSquared",
+    "PerturbationEffectCorrelation",
+    "compute_perturbation_effect_correlation",
     # Distance metrics
     "Wasserstein1Distance",
     "Wasserstein2Distance",
     "MMDDistance",
     "EnergyDistance",
+    "MSEDistance",
+    # Multivariate metrics
     "MultivariateWasserstein",
     "MultivariateMMD",
-    # Collections
+    # Registry
     "ALL_METRICS",
 ]

@@ -1,4 +1,4 @@
-# GGE: Generated Genetic Expression Evaluator
+# GGE: A Standardized Framework for Evaluating Gene Expression Generative Models
 
 [![PyPI version](https://badge.fury.io/py/gge-eval.svg)](https://badge.fury.io/py/gge-eval)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
@@ -6,9 +6,27 @@
 [![Tests](https://github.com/AndreaRubbi/GGE/actions/workflows/test.yml/badge.svg)](https://github.com/AndreaRubbi/GGE/actions)
 [![Documentation](https://img.shields.io/badge/docs-online-blue.svg)](https://andrearubbi.github.io/GGE/)
 
-**Comprehensive evaluation of generated gene expression data against real datasets.**
+> **Paper**: Accepted at the **Gen2 Workshop at ICLR 2026**
 
-GGE is a modular, object-oriented Python framework for computing metrics between real and generated gene expression datasets stored in AnnData (h5ad) format. It supports condition-based matching, train/test splits, and generates publication-quality visualizations.
+**Comprehensive, standardized evaluation of generated gene expression data.**
+
+GGE (Generated Genetic Expression Evaluator) addresses the urgent need for standardized evaluation in single-cell gene expression generative models. Current practices suffer from inconsistent metric implementations, incomparable hyperparameter choices, and lack of biologically-grounded metrics. GGE provides:
+
+- **Comprehensive suite of distributional metrics** with explicit computation space options
+- **Biologically-motivated evaluation** through DEG-focused analysis with perturbation-effect correlation
+- **Standardized reporting** for reproducible benchmarking
+
+## Key Differentiators
+
+| Feature | GGE | Others |
+|---------|-----|--------|
+| Explicit space control (raw/pca/deg) | ✓ | — |
+| Perturbation-effect correlation | ✓ | — |
+| Configurable DEG thresholds | ✓ | — |
+| GPU (CUDA) & Apple MPS acceleration | ✓ | Limited |
+| Per-gene & aggregate metrics | ✓ | Varies |
+| Visualization module | ✓ | — |
+| Single Python API call | ✓ | Multi-step |
 
 ## Features
 
@@ -19,10 +37,12 @@ All metrics are computed **per-gene** (returning a vector) and **aggregated**:
 |--------|-------------|-----------|
 | **Pearson Correlation** | Linear correlation between expression profiles | Higher is better |
 | **Spearman Correlation** | Rank correlation (robust to outliers) | Higher is better |
-| **R² (Coefficient of Determination)** | Proportion of variance explained | Higher is better |
+| **R²** | Coefficient of determination | Higher is better |
+| **Perturbation-Effect Correlation** | Correlation on (real - ctrl) vs (gen - ctrl) | Higher is better |
+| **MSE** | Mean Squared Error | Lower is better |
 | **Wasserstein-1** | Earth Mover's Distance (L1) | Lower is better |
-| **Wasserstein-2** | Quadratic optimal transport | Lower is better |
-| **MMD** | Maximum Mean Discrepancy (kernel-based) | Lower is better |
+| **Wasserstein-2** | Sinkhorn-regularized OT | Lower is better |
+| **MMD** | Maximum Mean Discrepancy (RBF kernel) | Lower is better |
 | **Energy Distance** | Statistical potential energy | Lower is better |
 
 ### Visualizations
@@ -33,13 +53,26 @@ All metrics are computed **per-gene** (returning a vector) and **aggregated**:
 - **Heatmaps**: Per-gene metric values
 - **Interactive Plotly plots**: Density overlays, embeddings with metadata coloring
 
+### Computation Spaces
+
+GGE treats computation space as a **first-class parameter** (see Paper Section 3.3):
+
+| Space | Description | When to Use |
+|-------|-------------|-------------|
+| **Raw Gene Space** | Full ~5,000–20,000 gene dimensions | Gene-level interpretability needed |
+| **PCA Space** | Reduced k-dimensional space (default: 50) | Primary distributional metrics |
+| **DEG Space** | Restricted to differentially expressed genes | Biologically-targeted evaluation |
+
+**Recommendation**: Use multi-space evaluation—PCA-50 for distributional metrics, DEG for biological focus.
+
 ### Key Features
-- ✅ Condition-based matching (perturbation, cell type, etc.)
-- ✅ Train/test split support
-- ✅ Per-gene and aggregate metrics
-- ✅ Modular, extensible architecture
-- ✅ Command-line interface
-- ✅ Publication-quality visualizations
+- ✅ **Explicit configuration**: Every choice exposed as a parameter
+- ✅ **Universal space support**: All metrics work in all spaces
+- ✅ **Condition-aware evaluation**: Per condition (cell type × perturbation)
+- ✅ **Perturbation-effect correlation**: Measures direction & magnitude of effects
+- ✅ **Hardware acceleration**: GPU (CUDA) and Apple MPS support
+- ✅ **Lazy data loading**: On-demand loading to avoid memory overhead
+- ✅ **Publication-quality visualizations**: Static and interactive plots
 
 ## Installation
 
@@ -116,10 +149,24 @@ gge --real real.h5ad --generated generated.h5ad \
 
 ### DEG-Space Evaluation
 
-GGE supports evaluating generative models specifically on differentially expressed genes (DEGs), which focuses the evaluation on the genes that matter most for capturing perturbation effects (see Paper Section 4.3):
+GGE supports evaluating generative models specifically on differentially expressed genes (DEGs), which focuses the evaluation on the genes that matter most for capturing perturbation effects (Paper Section 4.3).
+
+**The Problem**: Computing correlation on raw expression means can be artificially high if control and perturbed conditions have similar expression—dominated by genes similarly expressed across conditions.
+
+**The Solution**: Perturbation-Effect Correlation (Paper Equation 1):
+```
+ρ_effect = corr(μ_real - μ_ctrl, μ_gen - μ_ctrl)
+```
+
+This measures whether models capture the **direction and magnitude** of perturbation effects, not just absolute expression levels.
 
 ```python
-from gge import evaluate_deg_space, identify_degs, compute_perturbation_effects
+from gge import (
+    evaluate_deg_space, 
+    identify_degs, 
+    compute_perturbation_effects,
+    compute_perturbation_effect_correlation,
+)
 import scanpy as sc
 
 real_adata = sc.read_h5ad("real_data.h5ad")
@@ -141,21 +188,24 @@ results, deg_info = evaluate_deg_space(
 print(f"Found {deg_info['is_deg'].sum()} DEGs")
 deg_genes = deg_info[deg_info['is_deg']]['gene'].tolist()
 
-# Compute perturbation effects (log2 fold changes per condition)
+# Compute perturbation-effect correlation (Paper Eq. 1)
+control_mask = real_adata.obs['perturbation'] == 'control'
+control_mean = real_adata[control_mask].X.mean(axis=0)
+
+perturbed_mask = real_adata.obs['perturbation'] != 'control'
+rho_effect = compute_perturbation_effect_correlation(
+    real_perturbed=real_adata[perturbed_mask].X,
+    generated_perturbed=generated_adata[perturbed_mask].X,
+    control_mean=control_mean,
+    method="pearson",  # or "spearman"
+)
+print(f"Perturbation-effect correlation: {rho_effect:.3f}")
+
+# Compute fold changes for analysis
 effects = compute_perturbation_effects(
     real_adata,
     condition_column="perturbation",
     control_value="control",
-)
-print(effects.head())  # DataFrame: genes × conditions with log2FC values
-
-# Or identify DEGs separately for custom workflows
-degs = identify_degs(
-    real_adata,
-    condition_column="perturbation",
-    control_value="control",
-    treatment_value="treatment",  # Optional: specific treatment
-    method="ttest",  # or "wilcoxon"
 )
 ```
 
@@ -257,6 +307,20 @@ output/
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a pull request or open an issue.
+
+## Citation
+
+If you use GGE in your research, please cite our paper:
+
+```bibtex
+@inproceedings{rubbi2026gge,
+  title = {A Standardized Framework for Evaluating Gene Expression Generative Models},
+  author = {Rubbi, Andrea},
+  booktitle = {Gen2 Workshop at the International Conference on Learning Representations (ICLR)},
+  year = {2026},
+  url = {https://github.com/AndreaRubbi/GGE}
+}
+```
 
 ## License
 

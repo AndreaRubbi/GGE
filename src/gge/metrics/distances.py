@@ -514,3 +514,59 @@ class MultivariateMMD(DistributionMetric):
         )
         
         return np.full(n_genes, max(0, mmd))
+
+class MSEDistance(DistributionMetric):
+    """
+    Mean Squared Error between expression profiles.
+    
+    Measures the average squared difference between real and generated
+    mean expression profiles. Computed per gene.
+    
+    Lower values indicate more similar expression profiles.
+    
+    This is a simple reconstruction metric that directly measures
+    how well the generated data matches the real data.
+    
+    Examples
+    --------
+    >>> metric = MSEDistance()
+    >>> result = metric.compute(real_data, generated_data)
+    >>> print(f"MSE: {result.aggregate_value:.4f}")
+    """
+    
+    def __init__(self):
+        super().__init__(
+            name="mse",
+            description="Mean Squared Error per gene"
+        )
+    
+    def compute_per_gene(
+        self,
+        real: np.ndarray,
+        generated: np.ndarray,
+    ) -> np.ndarray:
+        """
+        Compute MSE for each gene.
+        
+        Parameters
+        ----------
+        real : np.ndarray
+            Real data, shape (n_samples_real, n_genes)
+        generated : np.ndarray
+            Generated data, shape (n_samples_gen, n_genes)
+            
+        Returns
+        -------
+        np.ndarray
+            MSE per gene (comparing means)
+        """
+        real = _ensure_2d(real)
+        generated = _ensure_2d(generated)
+        
+        # Compare mean expression profiles
+        real_mean = real.mean(axis=0)
+        gen_mean = generated.mean(axis=0)
+        
+        mse_per_gene = (real_mean - gen_mean) ** 2
+        
+        return mse_per_gene

@@ -1,23 +1,38 @@
-# GGE: Generated Genetic Expression Evaluator
+# GGE: A Standardized Framework for Evaluating Gene Expression Generative Models
 
 [![PyPI version](https://badge.fury.io/py/gge-eval.svg)](https://badge.fury.io/py/gge-eval)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Tests](https://github.com/AndreaRubbi/GGE/actions/workflows/test.yml/badge.svg)](https://github.com/AndreaRubbi/GGE/actions)
 
-**Comprehensive evaluation of generated gene expression data against real datasets.**
+> **Paper**: Accepted at the **Gen2 Workshop at ICLR 2026**
+
+**Comprehensive, standardized evaluation of generated gene expression data.**
 
 ## Overview
 
-GGE is a modular, object-oriented Python framework for computing metrics between real and generated gene expression datasets stored in AnnData (h5ad) format. It supports condition-based matching, train/test splits, and generates publication-quality visualizations.
+GGE (Generated Genetic Expression Evaluator) addresses the urgent need for standardized evaluation in single-cell gene expression generative models. Current practices suffer from:
+
+- Inconsistent metric implementations
+- Incomparable hyperparameter choices
+- Lack of biologically-grounded metrics
+
+GGE provides:
+
+- **Comprehensive suite of distributional metrics** with explicit computation space options (raw, PCA, DEG)
+- **Biologically-motivated evaluation** through DEG-focused analysis with perturbation-effect correlation
+- **Standardized reporting** for reproducible benchmarking
+- **GPU (CUDA) and Apple MPS acceleration** for efficient computation
 
 ## Key Features
 
-- **Multiple Metrics**: Pearson/Spearman correlation, Wasserstein distances, MMD, Energy distance
+- **Explicit Space Control**: Compute metrics in raw gene space, PCA space, or DEG-restricted space
+- **Perturbation-Effect Correlation**: Paper Equation 1: ρ_effect = corr(μ_real - μ_ctrl, μ_gen - μ_ctrl)
+- **Multiple Metrics**: Pearson, Spearman, R², MSE, Wasserstein, MMD, Energy distance
 - **Per-gene Analysis**: All metrics computed per-gene with aggregation options
 - **Condition Matching**: Match samples by perturbation, cell type, or other metadata
 - **Train/Test Splits**: Evaluate on held-out data
-- **Visualizations**: Boxplots, violin plots, radar charts, scatter plots, embeddings
+- **Visualizations**: Boxplots, violin plots, radar charts, scatter plots, embeddings, interactive Plotly
 - **CLI & API**: Use from command line or Python
 
 ## Quick Installation
@@ -43,12 +58,13 @@ print(results.summary())
 
 ## Citation
 
-If you use GGE in your research, please cite:
+If you use GGE in your research, please cite our paper:
 
 ```bibtex
-@software{gge2026,
-  title = {GGE: Generated Genetic Expression Evaluator},
+@inproceedings{rubbi2026gge,
+  title = {A Standardized Framework for Evaluating Gene Expression Generative Models},
   author = {Rubbi, Andrea},
+  booktitle = {Gen2 Workshop at the International Conference on Learning Representations (ICLR)},
   year = {2026},
   url = {https://github.com/AndreaRubbi/GGE}
 }
