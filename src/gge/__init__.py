@@ -36,8 +36,17 @@ __author__ = "GGE Team"
 # Main evaluation interface
 from .evaluator import (
     evaluate,
+    evaluate_lazy,
     GeneEvalEvaluator,
     MetricRegistry,
+)
+
+# Space transformation
+from .spaces import (
+    SpaceType,
+    SpaceConfig,
+    SpaceTransformer,
+    get_space_config,
 )
 
 # Data loading
@@ -120,8 +129,14 @@ __all__ = [
     "__version__",
     # Main API
     "evaluate",
+    "evaluate_lazy",
     "GeneEvalEvaluator",
     "MetricRegistry",
+    # Space transformation
+    "SpaceType",
+    "SpaceConfig",
+    "SpaceTransformer",
+    "get_space_config",
     # Data loading
     "GeneExpressionDataLoader",
     "load_data",

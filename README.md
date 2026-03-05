@@ -18,13 +18,14 @@ GGE (Generated Genetic Expression Evaluator) addresses the urgent need for stand
 
 ## Key Features
 
-- Explicit space control (raw, PCA, DEG)
+- Per-metric space configuration (raw, PCA, DEG)
 - Perturbation-effect correlation (Paper Eq. 1)
 - Configurable DEG thresholds
 - GPU (CUDA) and Apple MPS acceleration
 - Per-gene and aggregate metrics
 - Publication-quality visualizations (static and interactive)
 - Simple Python API and CLI
+- Mixed-space evaluation with `evaluate_lazy()`
 
 ## Metrics
 All metrics are computed **per-gene** (returning a vector) and **aggregated**:
@@ -264,6 +265,46 @@ print("Gene-space:", gene_results.summary())
 print("DEG-space:", deg_results.summary())
 print("PC-space:", pc_results.summary())
 ```
+
+### Mixed-Space Evaluation (Paper API)
+
+For maximum flexibility, use `evaluate_lazy()` with per-metric space configuration:
+
+```python
+from gge import evaluate_lazy
+from gge.metrics import (
+    PearsonCorrelation,
+    Wasserstein2Distance,
+    MMDDistance,
+    RSquared,
+)
+
+# Define metrics with different computation spaces
+metrics = [
+    # Correlation in DEG space (biologically-focused)
+    PearsonCorrelation(space="deg", deg_lfc=0.25, deg_pval=0.1),
+    
+    # Distributional metrics in PCA space (global structure)
+    Wasserstein2Distance(space="pca", n_components=50),
+    MMDDistance(space="pca", n_components=50),
+    
+    # R-squared in raw space
+    RSquared(space="raw"),
+]
+
+# Evaluate with mixed spaces
+results = evaluate_lazy(
+    real_path="real_data.h5ad",
+    generated_path="generated_data.h5ad",
+    condition_columns="perturbation",
+    control_key="ctrl",  # Required for DEG space
+    metrics=metrics,
+)
+
+print(results.summary())
+```
+
+Metric names automatically include space suffixes: `pearson_deg`, `wasserstein_2_pca50`, `mmd_pca50`, `r_squared`.
 
 ## Expected Data Format
 

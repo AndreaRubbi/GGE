@@ -13,10 +13,13 @@ while being computationally more tractable for optimal transport metrics.
 """
 from __future__ import annotations
 
-from typing import Optional, Union, List, Dict, Tuple
+from typing import Optional, Union, List, Dict, Tuple, TYPE_CHECKING
 from pathlib import Path
 import warnings
 import numpy as np
+
+if TYPE_CHECKING:
+    from ..results import EvaluationResult
 
 try:
     import anndata as ad

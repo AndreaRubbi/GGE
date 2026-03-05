@@ -26,7 +26,8 @@ GGE provides:
 
 ## Key Features
 
-- **Explicit Space Control**: Compute metrics in raw gene space, PCA space, or DEG-restricted space
+- **Per-Metric Space Configuration**: Compute each metric in raw gene space, PCA space, or DEG space
+- **Mixed-Space Evaluation**: Use `evaluate_lazy()` with different spaces per metric
 - **Perturbation-Effect Correlation**: Paper Equation 1: ρ_effect = corr(μ_real - μ_ctrl, μ_gen - μ_ctrl)
 - **Multiple Metrics**: Pearson, Spearman, R², MSE, Wasserstein, MMD, Energy distance
 - **Per-gene Analysis**: All metrics computed per-gene with aggregation options
@@ -54,6 +55,29 @@ results = evaluate(
 )
 
 print(results.summary())
+```
+
+## Mixed-Space Evaluation (Paper API)
+
+For maximum flexibility, configure each metric with its own computation space:
+
+```python
+from gge import evaluate_lazy
+from gge.metrics import PearsonCorrelation, Wasserstein2Distance, MMDDistance
+
+metrics = [
+    PearsonCorrelation(space="deg", deg_lfc=0.25, deg_pval=0.1),
+    Wasserstein2Distance(space="pca", n_components=50),
+    MMDDistance(space="pca", n_components=50),
+]
+
+results = evaluate_lazy(
+    real_path="real.h5ad",
+    generated_path="generated.h5ad",
+    condition_columns="perturbation",
+    control_key="ctrl",
+    metrics=metrics,
+)
 ```
 
 ## Citation

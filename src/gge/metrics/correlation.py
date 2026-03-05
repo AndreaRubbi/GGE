@@ -2,14 +2,17 @@
 Correlation metrics for gene expression evaluation.
 
 Provides Pearson and Spearman correlation metrics with per-gene computation.
+All metrics support computation in different spaces: raw, pca, deg.
 """
 from __future__ import annotations
 
 import numpy as np
 from scipy.stats import pearsonr, spearmanr
-from typing import Optional
+from typing import Optional, Literal
 
 from .base_metric import CorrelationMetric
+
+SpaceType = Literal["raw", "pca", "deg"]
 
 
 class PearsonCorrelation(CorrelationMetric):
@@ -18,12 +21,45 @@ class PearsonCorrelation(CorrelationMetric):
     
     Computed per gene by correlating expression values across samples.
     Higher values (closer to 1) indicate better agreement.
+    
+    Parameters
+    ----------
+    space : str
+        Computation space: "raw", "pca", or "deg" (default: "raw")
+    n_components : int
+        PCA components (for space="pca")
+    deg_lfc : float
+        log2 fold change threshold (for space="deg")
+    deg_pval : float
+        p-value threshold (for space="deg")
+    n_top_degs : int, optional
+        Select top N DEGs (for space="deg")
+        
+    Examples
+    --------
+    >>> # Raw space (default)
+    >>> metric = PearsonCorrelation()
+    
+    >>> # DEG space with custom thresholds (Paper example)
+    >>> metric = PearsonCorrelation(space="deg", deg_lfc=0.25, deg_pval=0.1)
     """
     
-    def __init__(self):
+    def __init__(
+        self,
+        space: SpaceType = "raw",
+        n_components: int = 50,
+        deg_lfc: float = 1.0,
+        deg_pval: float = 0.05,
+        n_top_degs: Optional[int] = None,
+    ):
         super().__init__(
             name="pearson",
-            description="Pearson correlation coefficient (per gene across samples)"
+            description="Pearson correlation coefficient (per gene across samples)",
+            space=space,
+            n_components=n_components,
+            deg_lfc=deg_lfc,
+            deg_pval=deg_pval,
+            n_top_degs=n_top_degs,
         )
     
     def compute_per_gene(
@@ -92,12 +128,25 @@ class SpearmanCorrelation(CorrelationMetric):
     Spearman rank correlation between real and generated gene expression.
     
     More robust to outliers than Pearson. Measures monotonic relationship.
+    Supports computation in raw, pca, or deg space.
     """
     
-    def __init__(self):
+    def __init__(
+        self,
+        space: SpaceType = "raw",
+        n_components: int = 50,
+        deg_lfc: float = 1.0,
+        deg_pval: float = 0.05,
+        n_top_degs: Optional[int] = None,
+    ):
         super().__init__(
             name="spearman",
-            description="Spearman rank correlation coefficient"
+            description="Spearman rank correlation coefficient",
+            space=space,
+            n_components=n_components,
+            deg_lfc=deg_lfc,
+            deg_pval=deg_pval,
+            n_top_degs=n_top_degs,
         )
     
     def compute_per_gene(
@@ -157,12 +206,25 @@ class MeanPearsonCorrelation(CorrelationMetric):
     
     Computes mean expression per gene, then correlates the profiles.
     Returns single value replicated across genes.
+    Supports computation in raw, pca, or deg space.
     """
     
-    def __init__(self):
+    def __init__(
+        self,
+        space: SpaceType = "raw",
+        n_components: int = 50,
+        deg_lfc: float = 1.0,
+        deg_pval: float = 0.05,
+        n_top_degs: Optional[int] = None,
+    ):
         super().__init__(
             name="mean_pearson",
-            description="Pearson correlation on mean expression profiles"
+            description="Pearson correlation on mean expression profiles",
+            space=space,
+            n_components=n_components,
+            deg_lfc=deg_lfc,
+            deg_pval=deg_pval,
+            n_top_degs=n_top_degs,
         )
     
     def compute_per_gene(
@@ -202,12 +264,25 @@ class MeanPearsonCorrelation(CorrelationMetric):
 class MeanSpearmanCorrelation(CorrelationMetric):
     """
     Spearman correlation on mean expression profiles.
+    Supports computation in raw, pca, or deg space.
     """
     
-    def __init__(self):
+    def __init__(
+        self,
+        space: SpaceType = "raw",
+        n_components: int = 50,
+        deg_lfc: float = 1.0,
+        deg_pval: float = 0.05,
+        n_top_degs: Optional[int] = None,
+    ):
         super().__init__(
             name="mean_spearman",
-            description="Spearman correlation on mean expression profiles"
+            description="Spearman correlation on mean expression profiles",
+            space=space,
+            n_components=n_components,
+            deg_lfc=deg_lfc,
+            deg_pval=deg_pval,
+            n_top_degs=n_top_degs,
         )
     
     def compute_per_gene(
@@ -243,14 +318,27 @@ class RSquared(CorrelationMetric):
     
     Higher values (closer to 1) indicate better fit.
     Can be negative if generated data is worse than predicting the mean.
+    Supports computation in raw, pca, or deg space.
     
     Reference: GGE Paper Section 3.3 "The Space Question: A Theoretical Analysis"
     """
     
-    def __init__(self):
+    def __init__(
+        self,
+        space: SpaceType = "raw",
+        n_components: int = 50,
+        deg_lfc: float = 1.0,
+        deg_pval: float = 0.05,
+        n_top_degs: Optional[int] = None,
+    ):
         super().__init__(
             name="r_squared",
-            description="Coefficient of determination (R²) measuring variance explained"
+            description="Coefficient of determination (R²) measuring variance explained",
+            space=space,
+            n_components=n_components,
+            deg_lfc=deg_lfc,
+            deg_pval=deg_pval,
+            n_top_degs=n_top_degs,
         )
     
     def compute_per_gene(
@@ -308,6 +396,8 @@ class RSquared(CorrelationMetric):
         aggregate_method: str = "mean",
         condition: Optional[str] = None,
         split: Optional[str] = None,
+        control_data: Optional[np.ndarray] = None,
+        **kwargs,
     ):
         """
         Compute overall R² between mean expression profiles.
@@ -368,6 +458,16 @@ class PerturbationEffectCorrelation(CorrelationMetric):
     ----------
     method : str
         Correlation method: 'pearson' or 'spearman'
+    space : str
+        Computation space: "raw", "pca", or "deg" (default: "raw")
+    n_components : int
+        PCA components (for space="pca")
+    deg_lfc : float
+        log2 fold change threshold (for space="deg")
+    deg_pval : float
+        p-value threshold (for space="deg")
+    n_top_degs : int, optional
+        Select top N DEGs (for space="deg")
     
     Examples
     --------
@@ -379,11 +479,24 @@ class PerturbationEffectCorrelation(CorrelationMetric):
     ... )
     """
     
-    def __init__(self, method: str = "pearson"):
+    def __init__(
+        self, 
+        method: str = "pearson",
+        space: SpaceType = "raw",
+        n_components: int = 50,
+        deg_lfc: float = 1.0,
+        deg_pval: float = 0.05,
+        n_top_degs: Optional[int] = None,
+    ):
         self.method = method
         super().__init__(
             name=f"perturbation_effect_{method}",
-            description=f"{method.capitalize()} correlation on perturbation effects (Paper Eq. 1)"
+            description=f"{method.capitalize()} correlation on perturbation effects (Paper Eq. 1)",
+            space=space,
+            n_components=n_components,
+            deg_lfc=deg_lfc,
+            deg_pval=deg_pval,
+            n_top_degs=n_top_degs,
         )
     
     def compute_per_gene(
@@ -452,6 +565,8 @@ class PerturbationEffectCorrelation(CorrelationMetric):
         aggregate_method: str = "mean",
         condition: Optional[str] = None,
         split: Optional[str] = None,
+        control_data: Optional[np.ndarray] = None,
+        **kwargs,
     ):
         """
         Compute overall perturbation-effect correlation.
@@ -469,6 +584,8 @@ class PerturbationEffectCorrelation(CorrelationMetric):
             Mean expression of control cells, shape (n_genes,)
         gene_names : list, optional
             Gene names for results
+        control_data : np.ndarray, optional
+            Alternative to control_mean: full control data array
             
         Returns
         -------
@@ -480,6 +597,10 @@ class PerturbationEffectCorrelation(CorrelationMetric):
         real = np.atleast_2d(real)
         generated = np.atleast_2d(generated)
         n_genes = real.shape[1]
+        
+        # Use control_data if control_mean not provided
+        if control_mean is None and control_data is not None:
+            control_mean = np.atleast_2d(control_data).mean(axis=0)
         
         if control_mean is None:
             # Return NaN result if no control provided

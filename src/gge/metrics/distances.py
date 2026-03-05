@@ -2,15 +2,18 @@
 Distribution distance metrics for gene expression evaluation.
 
 Provides Wasserstein, MMD, and Energy distance metrics with per-gene computation.
+All metrics support computation in different spaces: raw, pca, deg.
 """
 from __future__ import annotations
 
 import numpy as np
 from scipy.stats import wasserstein_distance
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Literal
 import warnings
 
 from .base_metric import DistributionMetric
+
+SpaceType = Literal["raw", "pca", "deg"]
 
 
 def _ensure_2d(arr: np.ndarray) -> np.ndarray:
@@ -29,12 +32,38 @@ class Wasserstein1Distance(DistributionMetric):
     into another. Computed per gene using 1D Wasserstein distance.
     
     Lower values indicate more similar distributions.
+    Supports computation in raw, pca, or deg space.
+    
+    Parameters
+    ----------
+    space : str
+        Computation space: "raw", "pca", or "deg" (default: "raw")
+    n_components : int
+        PCA components (for space="pca")
+    deg_lfc : float
+        log2 fold change threshold (for space="deg")
+    deg_pval : float
+        p-value threshold (for space="deg")
+    n_top_degs : int, optional
+        Select top N DEGs (for space="deg")
     """
     
-    def __init__(self):
+    def __init__(
+        self,
+        space: SpaceType = "raw",
+        n_components: int = 50,
+        deg_lfc: float = 1.0,
+        deg_pval: float = 0.05,
+        n_top_degs: Optional[int] = None,
+    ):
         super().__init__(
             name="wasserstein_1",
-            description="Wasserstein-1 (Earth Mover's) distance per gene"
+            description="Wasserstein-1 (Earth Mover's) distance per gene",
+            space=space,
+            n_components=n_components,
+            deg_lfc=deg_lfc,
+            deg_pval=deg_pval,
+            n_top_degs=n_top_degs,
         )
     
     def compute_per_gene(
@@ -85,20 +114,41 @@ class Wasserstein2Distance(DistributionMetric):
     Wasserstein-2 distance (quadratic cost) between distributions.
     
     Uses p=2 norm for transport cost. More sensitive to outliers than W1.
-    Computed per gene.
+    Computed per gene. Supports computation in raw, pca, or deg space.
+    
+    Parameters
+    ----------
+    use_geomloss : bool
+        If True, use geomloss for GPU-accelerated computation.
+    space : str
+        Computation space: "raw", "pca", or "deg" (default: "raw")
+    n_components : int
+        PCA components (for space="pca")
+    deg_lfc : float
+        log2 fold change threshold (for space="deg")
+    deg_pval : float
+        p-value threshold (for space="deg")
+    n_top_degs : int, optional
+        Select top N DEGs (for space="deg")
     """
     
-    def __init__(self, use_geomloss: bool = True):
-        """
-        Parameters
-        ----------
-        use_geomloss : bool
-            If True, use geomloss for GPU-accelerated computation.
-            Falls back to scipy otherwise.
-        """
+    def __init__(
+        self, 
+        use_geomloss: bool = True,
+        space: SpaceType = "raw",
+        n_components: int = 50,
+        deg_lfc: float = 1.0,
+        deg_pval: float = 0.05,
+        n_top_degs: Optional[int] = None,
+    ):
         super().__init__(
             name="wasserstein_2",
-            description="Wasserstein-2 distance per gene"
+            description="Wasserstein-2 distance per gene",
+            space=space,
+            n_components=n_components,
+            deg_lfc=deg_lfc,
+            deg_pval=deg_pval,
+            n_top_degs=n_top_degs,
         )
         self.use_geomloss = use_geomloss
         self._geomloss_available = False
@@ -192,20 +242,44 @@ class MMDDistance(DistributionMetric):
     
     Non-parametric distance based on kernel embeddings.
     Uses RBF (Gaussian) kernel. Computed per gene.
+    Supports computation in raw, pca, or deg space.
+    
+    Parameters
+    ----------
+    kernel : str
+        Kernel type ("rbf" for Gaussian)
+    sigma : float, optional
+        Kernel bandwidth. If None, uses median heuristic.
+    space : str
+        Computation space: "raw", "pca", or "deg" (default: "raw")
+    n_components : int
+        PCA components (for space="pca")
+    deg_lfc : float
+        log2 fold change threshold (for space="deg")
+    deg_pval : float
+        p-value threshold (for space="deg")
+    n_top_degs : int, optional
+        Select top N DEGs (for space="deg")
     """
     
-    def __init__(self, kernel: str = "rbf", sigma: Optional[float] = None):
-        """
-        Parameters
-        ----------
-        kernel : str
-            Kernel type ("rbf" for Gaussian)
-        sigma : float, optional
-            Kernel bandwidth. If None, uses median heuristic.
-        """
+    def __init__(
+        self, 
+        kernel: str = "rbf", 
+        sigma: Optional[float] = None,
+        space: SpaceType = "raw",
+        n_components: int = 50,
+        deg_lfc: float = 1.0,
+        deg_pval: float = 0.05,
+        n_top_degs: Optional[int] = None,
+    ):
         super().__init__(
             name="mmd",
-            description="Maximum Mean Discrepancy with RBF kernel"
+            description="Maximum Mean Discrepancy with RBF kernel",
+            space=space,
+            n_components=n_components,
+            deg_lfc=deg_lfc,
+            deg_pval=deg_pval,
+            n_top_degs=n_top_degs,
         )
         self.kernel = kernel
         self.sigma = sigma
@@ -296,12 +370,41 @@ class EnergyDistance(DistributionMetric):
     
     Based on statistical potential energy. Related to but different from
     Wasserstein distance. Computed per gene.
+    Supports computation in raw, pca, or deg space.
+    
+    Parameters
+    ----------
+    use_geomloss : bool
+        If True, use geomloss for GPU-accelerated computation.
+    space : str
+        Computation space: "raw", "pca", or "deg" (default: "raw")
+    n_components : int
+        PCA components (for space="pca")
+    deg_lfc : float
+        log2 fold change threshold (for space="deg")
+    deg_pval : float
+        p-value threshold (for space="deg")
+    n_top_degs : int, optional
+        Select top N DEGs (for space="deg")
     """
     
-    def __init__(self, use_geomloss: bool = True):
+    def __init__(
+        self, 
+        use_geomloss: bool = True,
+        space: SpaceType = "raw",
+        n_components: int = 50,
+        deg_lfc: float = 1.0,
+        deg_pval: float = 0.05,
+        n_top_degs: Optional[int] = None,
+    ):
         super().__init__(
             name="energy",
-            description="Energy distance per gene"
+            description="Energy distance per gene",
+            space=space,
+            n_components=n_components,
+            deg_lfc=deg_lfc,
+            deg_pval=deg_pval,
+            n_top_degs=n_top_degs,
         )
         self.use_geomloss = use_geomloss
         self._geomloss_available = False
@@ -389,12 +492,44 @@ class MultivariateWasserstein(DistributionMetric):
     
     Unlike per-gene metrics, this computes distance in the joint space
     of all genes. Typically applied after PCA dimensionality reduction.
+    Supports computation in raw, pca, or deg space.
+    
+    Parameters
+    ----------
+    p : int
+        Wasserstein-p distance (default: 2)
+    blur : float
+        Sinkhorn regularization (default: 0.01)
+    space : str
+        Computation space: "raw", "pca", or "deg" (default: "raw")
+    n_components : int
+        PCA components (for space="pca")
+    deg_lfc : float
+        log2 fold change threshold (for space="deg")
+    deg_pval : float
+        p-value threshold (for space="deg")
+    n_top_degs : int, optional
+        Select top N DEGs (for space="deg")
     """
     
-    def __init__(self, p: int = 2, blur: float = 0.01):
+    def __init__(
+        self, 
+        p: int = 2, 
+        blur: float = 0.01,
+        space: SpaceType = "raw",
+        n_components: int = 50,
+        deg_lfc: float = 1.0,
+        deg_pval: float = 0.05,
+        n_top_degs: Optional[int] = None,
+    ):
         super().__init__(
             name="multivariate_wasserstein",
-            description=f"Multivariate Wasserstein-{p} distance"
+            description=f"Multivariate Wasserstein-{p} distance",
+            space=space,
+            n_components=n_components,
+            deg_lfc=deg_lfc,
+            deg_pval=deg_pval,
+            n_top_degs=n_top_degs,
         )
         self.p = p
         self.blur = blur
@@ -459,12 +594,41 @@ class MultivariateWasserstein(DistributionMetric):
 class MultivariateMMD(DistributionMetric):
     """
     Multivariate MMD on full gene expression space.
+    Supports computation in raw, pca, or deg space.
+    
+    Parameters
+    ----------
+    sigma : float, optional
+        Kernel bandwidth. If None, uses median heuristic.
+    space : str
+        Computation space: "raw", "pca", or "deg" (default: "raw")
+    n_components : int
+        PCA components (for space="pca")
+    deg_lfc : float
+        log2 fold change threshold (for space="deg")
+    deg_pval : float
+        p-value threshold (for space="deg")
+    n_top_degs : int, optional
+        Select top N DEGs (for space="deg")
     """
     
-    def __init__(self, sigma: Optional[float] = None):
+    def __init__(
+        self, 
+        sigma: Optional[float] = None,
+        space: SpaceType = "raw",
+        n_components: int = 50,
+        deg_lfc: float = 1.0,
+        deg_pval: float = 0.05,
+        n_top_degs: Optional[int] = None,
+    ):
         super().__init__(
             name="multivariate_mmd",
-            description="Multivariate MMD with RBF kernel"
+            description="Multivariate MMD with RBF kernel",
+            space=space,
+            n_components=n_components,
+            deg_lfc=deg_lfc,
+            deg_pval=deg_pval,
+            n_top_degs=n_top_degs,
         )
         self.sigma = sigma
     
@@ -523,9 +687,20 @@ class MSEDistance(DistributionMetric):
     mean expression profiles. Computed per gene.
     
     Lower values indicate more similar expression profiles.
+    Supports computation in raw, pca, or deg space.
     
-    This is a simple reconstruction metric that directly measures
-    how well the generated data matches the real data.
+    Parameters
+    ----------
+    space : str
+        Computation space: "raw", "pca", or "deg" (default: "raw")
+    n_components : int
+        PCA components (for space="pca")
+    deg_lfc : float
+        log2 fold change threshold (for space="deg")
+    deg_pval : float
+        p-value threshold (for space="deg")
+    n_top_degs : int, optional
+        Select top N DEGs (for space="deg")
     
     Examples
     --------
@@ -534,10 +709,22 @@ class MSEDistance(DistributionMetric):
     >>> print(f"MSE: {result.aggregate_value:.4f}")
     """
     
-    def __init__(self):
+    def __init__(
+        self,
+        space: SpaceType = "raw",
+        n_components: int = 50,
+        deg_lfc: float = 1.0,
+        deg_pval: float = 0.05,
+        n_top_degs: Optional[int] = None,
+    ):
         super().__init__(
             name="mse",
-            description="Mean Squared Error per gene"
+            description="Mean Squared Error per gene",
+            space=space,
+            n_components=n_components,
+            deg_lfc=deg_lfc,
+            deg_pval=deg_pval,
+            n_top_degs=n_top_degs,
         )
     
     def compute_per_gene(
