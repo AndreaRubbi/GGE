@@ -197,7 +197,7 @@ class TestPCVarianceExplained:
         assert "cumulative" in var_info
         assert "total" in var_info
         assert len(var_info["per_component"]) == 10
-        assert var_info["cumulative"][-1] == var_info["total"]
+        assert var_info["cumulative"][-1] == pytest.approx(var_info["total"])
 
 
 if __name__ == "__main__":
