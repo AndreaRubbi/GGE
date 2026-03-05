@@ -6,7 +6,9 @@
 [![Tests](https://github.com/AndreaRubbi/GGE/actions/workflows/test.yml/badge.svg)](https://github.com/AndreaRubbi/GGE/actions)
 [![Documentation](https://img.shields.io/badge/docs-online-blue.svg)](https://andrearubbi.github.io/GGE/)
 
-> **Paper**: Accepted at the **Gen2 Workshop at ICLR 2026**
+> **Paper**: Accepted at the <a href="https://genai-in-genomics.github.io/index.html">**Gen2 Workshop at ICLR 2026** </a>
+
+![GGE framework](docs/GGE.png)
 
 **Comprehensive, standardized evaluation of generated gene expression data.**
 
@@ -342,13 +344,23 @@ Contributions are welcome! Please feel free to submit a pull request or open an 
 If you use GGE in your research, please cite our paper:
 
 ```bibtex
-@inproceedings{rubbi2026gge,
-  title = {A Standardized Framework for Evaluating Gene Expression Generative Models},
-  author = {Rubbi, Andrea and [CO-AUTHORS]},
-  booktitle = {Gen2 Workshop at the International Conference on Learning Representations (ICLR)},
-  year = {2026},
-  note = {[PROCEEDINGS DETAILS TO BE ADDED]},
-  url = {https://github.com/AndreaRubbi/GGE}
+@misc{rubbi2026gge,
+  title  = {A Standardized Framework for Evaluating Gene Expression Generative Models},
+  author = {Rubbi, Andrea and Di Francesco, Andrea Giuseppe and Lotfollahi, Mohammad and Liò, Pietro},
+  year   = {2026},
+  note   = {Presented at the GenAI in Genomics Workshop at ICLR 2026},
+  url    = {https://genai-in-genomics.github.io/}
+}
+```
+
+or the software
+
+```bibtex
+@software{rubbi2026gge,
+  author = {Rubbi, Andrea},
+  title  = {GGE: Generated Genetic Expression Evaluator},
+  year   = {2026},
+  url    = {https://github.com/AndreaRubbi/GGE}
 }
 ```
 
