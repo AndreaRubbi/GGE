@@ -18,6 +18,7 @@ from .correlation import (
     SpearmanCorrelation,
     MeanPearsonCorrelation,
     MeanSpearmanCorrelation,
+    RSquared,
 )
 from .distances import (
     Wasserstein1Distance,
@@ -34,6 +35,7 @@ ALL_METRICS = [
     SpearmanCorrelation,
     MeanPearsonCorrelation,
     MeanSpearmanCorrelation,
+    RSquared,
     Wasserstein1Distance,
     Wasserstein2Distance,
     MMDDistance,
@@ -53,6 +55,7 @@ __all__ = [
     "SpearmanCorrelation",
     "MeanPearsonCorrelation",
     "MeanSpearmanCorrelation",
+    "RSquared",
     # Distance metrics
     "Wasserstein1Distance",
     "Wasserstein2Distance",

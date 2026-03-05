@@ -304,3 +304,71 @@ def test_energy_legacy(sample_data):
     metric = EnergyDistance(use_geomloss=False)
     result = metric.compute(real, generated)
     assert isinstance(result.aggregate_value, float)
+
+
+# ==================== R-SQUARED TESTS ====================
+
+class TestRSquared:
+    """Tests for R-squared (coefficient of determination) metric."""
+    
+    def test_compute_per_gene(self, sample_data):
+        """Test per-gene R² computation."""
+        from gge.metrics import RSquared
+        
+        real, generated = sample_data
+        metric = RSquared()
+        
+        result = metric.compute_per_gene(real, generated)
+        
+        assert isinstance(result, np.ndarray)
+        assert result.shape == (real.shape[1],)
+    
+    def test_identical_data(self, identical_data):
+        """Test with identical data should give R²=1."""
+        from gge.metrics import RSquared
+        
+        real, generated = identical_data
+        metric = RSquared()
+        
+        result = metric.compute(real, generated)
+        
+        # Identical data should have R² = 1.0
+        assert result.aggregate_value > 0.99
+    
+    def test_full_compute(self, sample_data, gene_names):
+        """Test full compute with MetricResult."""
+        from gge.metrics import RSquared
+        
+        real, generated = sample_data
+        metric = RSquared()
+        
+        result = metric.compute(real, generated, gene_names=gene_names)
+        
+        assert isinstance(result, MetricResult)
+        assert result.name == "r_squared"
+        assert result.per_gene_values is not None
+        assert isinstance(result.aggregate_value, float)
+        
+    def test_different_data(self):
+        """Test with very different data gives low/negative R²."""
+        from gge.metrics import RSquared
+        
+        np.random.seed(42)
+        real = np.random.randn(100, 50)
+        generated = np.random.randn(100, 50) * 10 + 5  # Very different
+        
+        metric = RSquared()
+        result = metric.compute(real, generated)
+        
+        # Very different data should have low R²
+        assert result.aggregate_value < 0.5
+
+
+def test_r_squared_legacy(sample_data):
+    """Legacy test for R²."""
+    from gge.metrics import RSquared
+    
+    real, generated = sample_data
+    metric = RSquared()
+    result = metric.compute(real, generated)
+    assert isinstance(result.aggregate_value, float)

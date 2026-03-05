@@ -19,6 +19,7 @@ All metrics are computed **per-gene** (returning a vector) and **aggregated**:
 |--------|-------------|-----------|
 | **Pearson Correlation** | Linear correlation between expression profiles | Higher is better |
 | **Spearman Correlation** | Rank correlation (robust to outliers) | Higher is better |
+| **R² (Coefficient of Determination)** | Proportion of variance explained | Higher is better |
 | **Wasserstein-1** | Earth Mover's Distance (L1) | Lower is better |
 | **Wasserstein-2** | Quadratic optimal transport | Lower is better |
 | **MMD** | Maximum Mean Discrepancy (kernel-based) | Lower is better |
@@ -109,8 +110,45 @@ gge --real real.h5ad --generated generated.h5ad \
 # Specify metrics
 gge --real real.h5ad --generated generated.h5ad \
     --conditions perturbation \
-    --metrics pearson spearman wasserstein_1 mmd \
+    --metrics pearson spearman wasserstein_1 mmd r_squared \
     --output results/
+```
+
+### DEG-Space Evaluation
+
+GGE supports evaluating generative models specifically on differentially expressed genes (DEGs), which focuses the evaluation on the genes that matter most for capturing perturbation effects:
+
+```python
+from gge import evaluate_deg_space, identify_degs
+import scanpy as sc
+
+real_adata = sc.read_h5ad("real_data.h5ad")
+generated_adata = sc.read_h5ad("generated_data.h5ad")
+
+# Evaluate in DEG space (automatically identifies DEGs)
+results, deg_info = evaluate_deg_space(
+    real_data=real_adata,
+    generated_data=generated_adata,
+    condition_columns=["perturbation"],
+    deg_condition_column="perturbation",  # Column for DEG identification
+    control_value="control",               # Control condition label
+    log2fc_threshold=1.0,                  # |log2FC| > 1
+    pvalue_threshold=0.05,                 # Adjusted p-value < 0.05
+    return_degs=True,
+)
+
+# View identified DEGs
+print(f"Found {deg_info['is_deg'].sum()} DEGs")
+print(deg_info[deg_info['is_deg']][['gene', 'log2fc', 'pvalue_adj']])
+
+# Or identify DEGs separately
+degs = identify_degs(
+    real_adata,
+    condition_column="perturbation",
+    control_value="control",
+    treatment_value="treatment",  # Optional: specific treatment
+    method="ttest",  # or "wilcoxon"
+)
 ```
 
 ## Expected Data Format

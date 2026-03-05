@@ -30,7 +30,7 @@ CLI Usage:
           --conditions perturbation cell_type --output results/
 """
 
-__version__ = "0.1.4"
+__version__ = "0.1.5"
 __author__ = "GGE Team"
 
 # Main evaluation interface
@@ -65,6 +65,7 @@ from .metrics.correlation import (
     SpearmanCorrelation,
     MeanPearsonCorrelation,
     MeanSpearmanCorrelation,
+    RSquared,
 )
 from .metrics.distances import (
     Wasserstein1Distance,
@@ -79,6 +80,15 @@ from .metrics.distances import (
 from .visualization.visualizer import (
     EvaluationVisualizer,
     visualize,
+)
+
+# DEG utilities
+from .utils.deg import (
+    identify_degs,
+    evaluate_deg_space,
+    DEGSpaceEvaluator,
+    filter_to_degs,
+    compute_perturbation_effects,
 )
 
 # Legacy support
@@ -115,6 +125,7 @@ __all__ = [
     "SpearmanCorrelation",
     "MeanPearsonCorrelation",
     "MeanSpearmanCorrelation",
+    "RSquared",
     # Distance metrics
     "Wasserstein1Distance",
     "Wasserstein2Distance",
@@ -125,6 +136,12 @@ __all__ = [
     # Visualization
     "EvaluationVisualizer",
     "visualize",
+    # DEG utilities
+    "identify_degs",
+    "evaluate_deg_space",
+    "DEGSpaceEvaluator",
+    "filter_to_degs",
+    "compute_perturbation_effects",
     # Testing utilities
     "MockDataGenerator",
     "MockMetricData",
