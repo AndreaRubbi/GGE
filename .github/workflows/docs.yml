@@ -21,7 +21,12 @@ jobs:
       
       - name: Install dependencies
         run: |
-          pip install mkdocs mkdocs-material mkdocstrings[python]
+          pip install mkdocs mkdocs-material "mkdocstrings[python]>=0.24.0"
+          pip install anndata scanpy numpy pandas scipy matplotlib seaborn scikit-learn
+          pip install -e .
+      
+      - name: Build docs (verify)
+        run: mkdocs build --strict
       
       - name: Deploy to GitHub Pages
         run: mkdocs gh-deploy --force
