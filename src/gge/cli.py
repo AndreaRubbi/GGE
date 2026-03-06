@@ -22,12 +22,12 @@ Computes metrics between real and generated datasets, matching samples
 by condition columns (e.g., perturbation, cell type). Supports train/test
 splits and generates publication-quality visualizations.
 
-Metrics computed:
+Paper metrics:
   - Pearson and Spearman correlation
+  - R-squared (coefficient of determination)
   - Wasserstein-1 and Wasserstein-2 distance  
   - Maximum Mean Discrepancy (MMD)
   - Energy distance
-  - Multivariate versions of distance metrics
 
 All metrics are computed per-gene and aggregated.
         """,
@@ -83,11 +83,11 @@ All metrics are computed per-gene and aggregated.
         nargs="+",
         default=None,
         choices=[
-            "pearson", "spearman", "mean_pearson", "mean_spearman",
+            "pearson", "spearman", "r_squared",
             "wasserstein_1", "wasserstein_2", "mmd", "energy",
-            "multivariate_wasserstein", "multivariate_mmd", "all"
+            "all"
         ],
-        help="Metrics to compute. Default: all metrics.",
+        help="Metrics to compute. Default: all paper metrics.",
     )
     optional.add_argument(
         "--min-samples",
@@ -166,21 +166,18 @@ def get_metric_classes(metric_names: Optional[List[str]] = None):
         Wasserstein2Distance,
         MMDDistance,
         EnergyDistance,
-        MultivariateWasserstein,
-        MultivariateMMD,
+        RSquared,
     )
     
+    # Paper metrics only (no mean_ variants or multivariate)
     all_metrics = {
         "pearson": PearsonCorrelation,
         "spearman": SpearmanCorrelation,
-        "mean_pearson": MeanPearsonCorrelation,
-        "mean_spearman": MeanSpearmanCorrelation,
+        "r_squared": RSquared,
         "wasserstein_1": Wasserstein1Distance,
         "wasserstein_2": Wasserstein2Distance,
         "mmd": MMDDistance,
         "energy": EnergyDistance,
-        "multivariate_wasserstein": MultivariateWasserstein,
-        "multivariate_mmd": MultivariateMMD,
     }
     
     if metric_names is None or "all" in metric_names:

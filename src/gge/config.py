@@ -14,20 +14,19 @@ from typing import List, Dict, Any, Optional
 class MetricConfig:
     """Configuration for metric computation."""
     
-    # Default metrics to compute
+    # Default metrics to compute (paper metrics only)
     default_metrics: List[str] = field(default_factory=lambda: [
         "pearson",
         "spearman", 
-        "mean_pearson",
-        "mean_spearman",
+        "r_squared",
         "wasserstein_1",
         "wasserstein_2",
         "mmd",
         "energy",
     ])
     
-    # Whether to include multivariate metrics
-    include_multivariate: bool = True
+    # Whether to include multivariate metrics (disabled by default - not in paper)
+    include_multivariate: bool = False
     
     # Aggregation method for per-gene metrics
     aggregate_method: str = "mean"

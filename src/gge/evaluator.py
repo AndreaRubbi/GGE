@@ -36,12 +36,11 @@ from .metrics.distances import (
 from .results import EvaluationResult, SplitResult, ConditionResult
 
 
-# Default metrics to compute
+# Default metrics to compute (paper metrics only - no mean_ variants or multivariate)
 DEFAULT_METRICS = [
     PearsonCorrelation,
     SpearmanCorrelation,
-    MeanPearsonCorrelation,
-    MeanSpearmanCorrelation,
+    RSquared,
     Wasserstein1Distance,
     Wasserstein2Distance,
     MMDDistance,
@@ -102,7 +101,7 @@ class GeneEvalEvaluator:
         data_loader: GeneExpressionDataLoader,
         metrics: Optional[List[Union[BaseMetric, Type[BaseMetric]]]] = None,
         aggregate_method: str = "mean",
-        include_multivariate: bool = True,
+        include_multivariate: bool = False,
         control_key: Optional[str] = None,
         control_column: Optional[str] = None,
         verbose: bool = True,
@@ -333,7 +332,7 @@ def evaluate(
     split_column: Optional[str] = None,
     output_dir: Optional[Union[str, Path]] = None,
     metrics: Optional[List[Union[BaseMetric, Type[BaseMetric], str]]] = None,
-    include_multivariate: bool = True,
+    include_multivariate: bool = False,
     control_key: Optional[str] = None,
     control_column: Optional[str] = None,
     verbose: bool = True,
@@ -440,7 +439,7 @@ def evaluate_lazy(
     Args:
         real_path: Path to real gene expression data
         generated_path: Path to generated gene expression data
-        condition_columns: Column(s) for condition-wise stratification
+        condition_columns: Column(s) for condition-wise stratification (string or list)
         metrics: List of metric instances with their space configurations
         control_key: Value identifying control samples for DEG space (required if any metric uses "deg" space)
         control_column: Column containing control identifier (defaults to first condition column)
@@ -463,13 +462,17 @@ def evaluate_lazy(
         ... ]
         >>> 
         >>> results = evaluate_lazy(
-        ...     "real_data.csv",
-        ...     "generated_data.csv", 
-        ...     condition_columns="perturbation",
+        ...     "real_data.h5ad",
+        ...     "generated_data.h5ad", 
+        ...     condition_columns="perturbation",  # Can be string or list
         ...     control_key="ctrl",
         ...     metrics=metrics
         ... )
     """
+    # Convert string to list if needed
+    if isinstance(condition_columns, str):
+        condition_columns = [condition_columns]
+    
     return evaluate(
         real_data=real_path,
         generated_data=generated_path,

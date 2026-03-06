@@ -42,14 +42,11 @@ class PlotStyle:
     METRIC_PALETTE = {
         "pearson": "#2ecc71",      # Green
         "spearman": "#27ae60",     # Dark green
-        "mean_pearson": "#3498db",  # Blue
-        "mean_spearman": "#2980b9", # Dark blue
+        "r_squared": "#1abc9c",    # Teal
         "wasserstein_1": "#e74c3c", # Red
         "wasserstein_2": "#c0392b", # Dark red
         "mmd": "#9b59b6",          # Purple
         "energy": "#8e44ad",       # Dark purple
-        "multivariate_wasserstein": "#f39c12",  # Yellow
-        "multivariate_mmd": "#d35400",          # Orange
     }
     
     # Default figure sizes
@@ -158,6 +155,7 @@ class EvaluationVisualizer:
         split: Optional[str] = None,
         figsize: Tuple[int, int] = PlotStyle.FIGURE_WIDE,
         palette: Optional[Dict[str, str]] = None,
+        normalized: bool = False,
     ) -> Figure:
         """
         Create boxplot of metric values across conditions.
@@ -172,6 +170,9 @@ class EvaluationVisualizer:
             Figure size
         palette : Dict[str, str], optional
             Color mapping for metrics
+        normalized : bool
+            If True, normalize all metrics to 0-1 scale (distance metrics are
+            inverted so higher = better). Useful for overview comparison.
             
         Returns
         -------
@@ -200,6 +201,18 @@ class EvaluationVisualizer:
             value_name="value"
         )
         
+        # Normalize if requested
+        if normalized:
+            # Distance metrics (lower = better) - invert so higher = better
+            distance_metrics = ['wasserstein_1', 'wasserstein_2', 'mmd', 'energy']
+            for metric in distance_metrics:
+                mask = df_long['metric'] == metric
+                if mask.any():
+                    values = df_long.loc[mask, 'value']
+                    max_val = values.max()
+                    if max_val > 0:
+                        df_long.loc[mask, 'value'] = 1 - (values / max_val)
+        
         # Create figure
         fig, ax = plt.subplots(figsize=figsize)
         
@@ -215,10 +228,101 @@ class EvaluationVisualizer:
         )
         
         ax.set_xlabel("Metric")
-        ax.set_ylabel("Value")
-        ax.set_title(f"Metric Distributions{' (' + split + ')' if split else ''}")
+        suffix = " (Normalized, Higher=Better)" if normalized else ""
+        ax.set_ylabel("Value" + suffix)
+        ax.set_title(f"Metric Distributions{' (' + split + ')' if split else ''}{suffix}")
         plt.xticks(rotation=45, ha='right')
         
+        if normalized:
+            ax.set_ylim(0, 1.1)
+            ax.axhline(y=1.0, color='gray', linestyle='--', alpha=0.5)
+        
+        fig.tight_layout()
+        return fig
+    
+    def boxplot_metrics_grid(
+        self,
+        metrics: Optional[List[str]] = None,
+        split: Optional[str] = None,
+        figsize: Tuple[int, int] = PlotStyle.FIGURE_LARGE,
+        ncols: int = 4,
+    ) -> Figure:
+        """
+        Create grid of boxplots, one per metric with individual y-axes.
+        
+        This is useful when metrics have very different scales.
+        
+        Parameters
+        ----------
+        metrics : List[str], optional
+            Metrics to include. If None, uses all available.
+        split : str, optional
+            Filter to specific split
+        figsize : Tuple[int, int]
+            Figure size
+        ncols : int
+            Number of columns in grid
+            
+        Returns
+        -------
+        Figure
+            Matplotlib figure with subplots
+        """
+        df = self._get_all_metrics_data(split)
+        
+        if df.empty:
+            fig, ax = plt.subplots(figsize=figsize)
+            ax.text(0.5, 0.5, "No data available", ha='center', va='center')
+            return fig
+        
+        # Get metric columns
+        meta_cols = ["split", "condition", "perturbation"]
+        available_metrics = [c for c in df.columns if c not in meta_cols]
+        
+        if metrics is not None:
+            available_metrics = [m for m in metrics if m in available_metrics]
+        
+        # Metric info for labels
+        metric_info = {
+            'pearson': ('Pearson ρ', 'Higher = Better'),
+            'spearman': ('Spearman ρ', 'Higher = Better'),
+            'r_squared': ('R²', 'Higher = Better'),
+            'wasserstein_1': ('W₁ Distance', 'Lower = Better'),
+            'wasserstein_2': ('W₂ Distance', 'Lower = Better'),
+            'mmd': ('MMD', 'Lower = Better'),
+            'energy': ('Energy Dist.', 'Lower = Better'),
+        }
+        
+        n_metrics = len(available_metrics)
+        nrows = (n_metrics + ncols - 1) // ncols
+        
+        fig, axes = plt.subplots(nrows, ncols, figsize=figsize)
+        axes = np.atleast_2d(axes).flatten()
+        
+        colors = PlotStyle.METRIC_PALETTE
+        
+        for idx, metric in enumerate(available_metrics):
+            ax = axes[idx]
+            values = df[metric].dropna()
+            
+            title, direction = metric_info.get(metric, (metric, ''))
+            color = colors.get(metric, '#95a5a6')
+            
+            ax.boxplot([values], patch_artist=True,
+                       boxprops=dict(facecolor=color, alpha=0.7),
+                       medianprops=dict(color='black'))
+            
+            ax.set_title(f'{title}\n({direction})', fontsize=10, fontweight='bold')
+            ax.set_ylabel('Value')
+            ax.set_xticklabels([''])
+            ax.yaxis.grid(True, alpha=0.3)
+        
+        # Hide unused subplots
+        for idx in range(n_metrics, len(axes)):
+            axes[idx].axis('off')
+        
+        fig.suptitle(f'Per-Metric Distributions{" (" + split + ")" if split else ""}',
+                     fontsize=12, fontweight='bold', y=1.02)
         fig.tight_layout()
         return fig
     
