@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "gge-eval"
-version = "1.0.0"
+version = "1.0.1"
 description = "A Standardized Framework for Evaluating Gene Expression Generative Models. Accepted at Gen2 Workshop @ ICLR 2026. Provides explicit computation space options (raw/pca/deg), perturbation-effect correlation, and standardized reporting for reproducible benchmarking."
 authors = ["GGE Team <gge@example.com>"]
 license = "MIT"
