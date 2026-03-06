@@ -18,6 +18,8 @@ GGE (Generated Genetic Expression Evaluator) addresses the urgent need for stand
 - **Biologically-motivated evaluation** through DEG-focused analysis with perturbation-effect correlation
 - **Standardized reporting** for reproducible benchmarking
 
+> **Full Documentation** with API tutorials can be found <a href="https://andrearubbi.github.io/GGE/">here</a>
+
 ## Key Features
 
 - Per-metric space configuration (raw, PCA, DEG)
